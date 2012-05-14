@@ -92,7 +92,7 @@ else {
 }
 
 my @modules = qw(
-  INSERT_MODULE_LIST_HERE 
+INSERT_MODULE_LIST_HERE
 );
 
 # replace modules with dynamic results from MYMETA.json if we can
