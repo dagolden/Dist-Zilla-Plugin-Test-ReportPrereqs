@@ -26,7 +26,7 @@ sub after_build {
 
 sub _module_list {
   my $self = shift;
-  my $prereqs = $self->zilla->prereqs;
+  my $prereqs = $self->zilla->prereqs->as_string_hash;
   my %uniq = map {$_ => 1} map { keys %$_ } map { values %$_ } values %$prereqs;
   return sort keys %uniq; ## no critic
 }
@@ -72,7 +72,7 @@ suit my style and needs.
 =cut
 
 __DATA__
-___[ t/000-report-prereqs.t ]___
+___[ t/00-report-prereqs.t ]___
 #!perl
 
 use strict;
@@ -84,8 +84,12 @@ use ExtUtils::MakeMaker;
 use File::Spec::Functions;
 use List::Util qw/max/;
 
-plan skip_all => '$ENV{AUTOMATED_TESTING} not set'
-  unless $ENV{AUTOMATED_TESTING};
+if ( $ENV{AUTOMATED_TESTING} ) {
+  plan tests => 1;
+}
+else {
+  plan skip_all => '$ENV{AUTOMATED_TESTING} not set';
+}
 
 my @modules = qw(
   INSERT_MODULE_LIST_HERE 
@@ -100,9 +104,10 @@ if ( -f "MYMETA.json" && eval { require CPAN::Meta } ) {
   }
 }
 
-my @reports;
+my @reports = [qw/Version Module/];
 
 for my $mod ( @modules ) {
+  next if $mod eq 'perl';
   my $file = $mod;
   $file =~ s{::}{/}g;
   $file .= ".pm";
@@ -113,14 +118,15 @@ for my $mod ( @modules ) {
     push @reports, [$ver, $mod];
   }
   else {
-    push @reports, [$mod, "missing", $mod];
+    push @reports, ["missing", $mod];
   }
 }
     
 if ( @reports ) {
   my $vl = max map { length $_->[0] } @reports;
   my $ml = max map { length $_->[1] } @reports;
-  diag "Prereq versions:", map {sprintf('  %*s %*s',$vl,$_->[0],$ml,$_->[1])} @reports;
+  splice @reports, 1, 0, ["-" x $vl, "-" x $ml];
+  diag "Prerequisite Report:\n", map {sprintf("  %*s %*s\n",$vl,$_->[0],-$ml,$_->[1])} @reports;
 }
 
 pass;
