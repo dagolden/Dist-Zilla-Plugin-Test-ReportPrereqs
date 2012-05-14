@@ -6,6 +6,7 @@ package Dist::Zilla::Plugin::Test::ReportPrereqs;
 # ABSTRACT: No abstract given for Dist::Zilla::Plugin::Test::ReportPrereqs
 # VERSION
 
+use Dist::Zilla 4 ();
 use File::Slurp qw/read_file write_file/;
 
 use Moose;
@@ -26,14 +27,14 @@ sub _module_list {
   my $self = shift;
   my $prereqs = $self->zilla->prereqs->as_string_hash;
   my %uniq = map {$_ => 1} map { keys %$_ } map { values %$_ } values %$prereqs;
-  return sort keys %uniq;
+  return sort keys %uniq; ## no critic
 }
 
 __PACKAGE__->meta->make_immutable;
 
 1;
 
-=for Pod::Coverage method_names_here
+=for Pod::Coverage after_build
 
 =head1 SYNOPSIS
 
@@ -51,20 +52,21 @@ machine, MYMETA.json will be examined for prerequisites as it would include any
 dynamic prerequisites.  Otherwise, a static list of prerequisites is used,
 generated when distribution tarball was built.
 
-Version are reported based on the result of C<parse_version> from
-L<ExtUtils::MakeMaker>, which means they are not actually loaded (which avoids
-various edge cases with certain modules). Parse errors are reported as "undef".
-If a module is not installed, "missing" is reported instead of a version
-string.
+Versions are reported based on the result of C<parse_version> from
+L<ExtUtils::MakeMaker>, which means prerequisite modules are not actually
+loaded (which avoids various edge cases with certain modules). Parse errors are
+reported as "undef".  If a module is not installed, "missing" is reported
+instead of a version string.
 
 =head1 SEE ALSO
 
+Other Dist::Zilla::Plugins do similar things in slightly different ways that didn't
+suit my style and needs.
+
 =for :list
 * L<Dist::Zilla::Plugin::Test::PrereqsFromMeta> -- requires prereqs to be satisfied
-* L<Dist::Zilla::Plugin::Test::ReportVersions> -- bundles a copy of YAML::Tiny,
-reads prereqs only from META.yml, and attempts to load them with C<require>
-* L<Dist::Zilla::Plugin::Test::ReportVersions::Tiny> -- static list only, loads
-modules with C<require>
+* L<Dist::Zilla::Plugin::Test::ReportVersions> -- bundles a copy of YAML::Tiny, reads prereqs only from META.yml, and attempts to load them with C<require>
+* L<Dist::Zilla::Plugin::Test::ReportVersions::Tiny> -- static list only, loads modules with C<require>
 
 =cut
 
