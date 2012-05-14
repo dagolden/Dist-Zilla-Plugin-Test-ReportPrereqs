@@ -96,7 +96,9 @@ INSERT_MODULE_LIST_HERE
 );
 
 # replace modules with dynamic results from MYMETA.json if we can
-if ( -f "MYMETA.json" && eval { require CPAN::Meta } ) {
+# (hide CPAN::Meta from prereq scanner)
+my $cpan_meta = "CPAN::Meta";
+if ( -f "MYMETA.json" && eval "require $cpan_meta" ) { ## no critic
   if ( my $meta = eval { CPAN::Meta->load_file("MYMETA.json") } ) {
     my $prereqs = $meta->prereqs;
     my %uniq = map {$_ => 1} map { keys %$_ } map { values %$_ } values %$prereqs;
