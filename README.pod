@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Dist::Zilla::Plugin::Test::ReportPrereqs - No abstract given for Dist::Zilla::Plugin::Test::ReportPrereqs
+Dist::Zilla::Plugin::Test::ReportPrereqs - Report on prerequisite versions during automated testing
 
 =head1 VERSION
 

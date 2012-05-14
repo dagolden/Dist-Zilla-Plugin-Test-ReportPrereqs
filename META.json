@@ -1,5 +1,5 @@
 {
-   "abstract" : "No abstract given for Dist::Zilla::Plugin::Test::ReportPrereqs",
+   "abstract" : "Report on prerequisite versions during automated testing",
    "author" : [
       "David Golden <dagolden@cpan.org>"
    ],

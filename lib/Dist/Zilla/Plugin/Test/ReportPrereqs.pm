@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Dist::Zilla::Plugin::Test::ReportPrereqs;
-# ABSTRACT: No abstract given for Dist::Zilla::Plugin::Test::ReportPrereqs
+# ABSTRACT: Report on prerequisite versions during automated testing
 # VERSION
 
 use Dist::Zilla 4 ();
