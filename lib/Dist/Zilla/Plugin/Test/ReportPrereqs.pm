@@ -49,9 +49,8 @@ AUTOMATED_TESTING is true, it reports the version of all modules listed in the
 distribution metadata prerequisites (including 'recommends', 'suggests', etc.).
 
 If a MYMETA.json file exists and L<CPAN::Meta> is installed on the testing
-machine, MYMETA.json will be examined for prerequisites as it would include any
-dynamic prerequisites.  Otherwise, a static list of prerequisites is used,
-generated when distribution tarball was built.
+machine, MYMETA.json will be examined for prerequisites in addition, as it
+would include any dynamic prerequisites not set in the distribution metadata.
 
 Versions are reported based on the result of C<parse_version> from
 L<ExtUtils::MakeMaker>, which means prerequisite modules are not actually
@@ -102,6 +101,7 @@ if ( -f "MYMETA.json" && eval "require $cpan_meta" ) { ## no critic
   if ( my $meta = eval { CPAN::Meta->load_file("MYMETA.json") } ) {
     my $prereqs = $meta->prereqs;
     my %uniq = map {$_ => 1} map { keys %$_ } map { values %$_ } values %$prereqs;
+    $uniq{$_} = 1 for @modules; # don't lose any static ones
     @modules = sort keys %uniq;
   }
 }

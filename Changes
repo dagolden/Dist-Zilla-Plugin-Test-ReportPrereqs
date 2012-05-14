@@ -7,6 +7,9 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
   - Optional CPAN::Meta requirement of generated test file is now
     obscured to hide it from prerequisite scanners.
 
+  - Static requiremnents are merged with dynamic ones to ensure the
+    most complete report possible on modules of interest
+
 0.002     2012-05-14 15:11:36 America/New_York
 
   [Changed]
