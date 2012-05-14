@@ -2,6 +2,8 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+0.003     2012-05-14 15:23:08 America/New_York
+
   [Fixed]
 
   - Optional CPAN::Meta requirement of generated test file is now
