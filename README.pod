@@ -15,7 +15,7 @@ version 0.001
 
 =head1 DESCRIPTION
 
-This L<Dist::Zilla> plugin adds a t/000-report-prereqs.t test file.  If
+This L<Dist::Zilla> plugin adds a t/00-report-prereqs.t test file.  If
 AUTOMATED_TESTING is true, it reports the version of all modules listed in the
 distribution metadata prerequisites (including 'recommends', 'suggests', etc.).
 

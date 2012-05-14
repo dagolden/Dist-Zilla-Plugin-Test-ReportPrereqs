@@ -36,6 +36,7 @@
             "Dist::Zilla::Plugin::InlineFiles" : "0",
             "Dist::Zilla::Role::AfterBuild" : "0",
             "File::Slurp" : "0",
+            "File::Spec::Functions" : "0",
             "Moose" : "0",
             "perl" : "5.006",
             "strict" : "0",

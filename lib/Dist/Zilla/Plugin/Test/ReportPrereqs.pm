@@ -8,6 +8,7 @@ package Dist::Zilla::Plugin::Test::ReportPrereqs;
 
 use Dist::Zilla 4 ();
 use File::Slurp qw/read_file write_file/;
+use File::Spec::Functions;
 
 use Moose;
 extends 'Dist::Zilla::Plugin::InlineFiles';
@@ -16,7 +17,7 @@ with 'Dist::Zilla::Role::AfterBuild';
 sub after_build {
   my ($self, $opt) = @_;
   my $build_root = $opt->{build_root};
-  my $test_file = catfile($build_root, qw/t 000-report-prereqs.t/);
+  my $test_file = catfile($build_root, qw/t 00-report-prereqs.t/);
   my $guts = read_file($test_file);
   my $list = join("\n", map { "  $_" } $self->_module_list);
   $guts =~ s{INSERT_MODULE_LIST_HERE}{$list};
@@ -25,7 +26,7 @@ sub after_build {
 
 sub _module_list {
   my $self = shift;
-  my $prereqs = $self->zilla->prereqs->as_string_hash;
+  my $prereqs = $self->zilla->prereqs;
   my %uniq = map {$_ => 1} map { keys %$_ } map { values %$_ } values %$prereqs;
   return sort keys %uniq; ## no critic
 }
@@ -43,7 +44,7 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 DESCRIPTION
 
-This L<Dist::Zilla> plugin adds a t/000-report-prereqs.t test file.  If
+This L<Dist::Zilla> plugin adds a t/00-report-prereqs.t test file.  If
 AUTOMATED_TESTING is true, it reports the version of all modules listed in the
 distribution metadata prerequisites (including 'recommends', 'suggests', etc.).
 
@@ -93,7 +94,7 @@ my @modules = qw(
 # replace modules with dynamic results from MYMETA.json if we can
 if ( -f "MYMETA.json" && eval { require CPAN::Meta } ) {
   if ( my $meta = eval { CPAN::Meta->load_file("MYMETA.json") } ) {
-    my $prereqs = $meta->prereqs->as_string_hash;
+    my $prereqs = $meta->prereqs;
     my %uniq = map {$_ => 1} map { keys %$_ } map { values %$_ } values %$prereqs;
     @modules = sort keys %uniq;
   }
@@ -119,7 +120,7 @@ for my $mod ( @modules ) {
 if ( @reports ) {
   my $vl = max map { length $_->[0] } @reports;
   my $ml = max map { length $_->[1] } @reports;
-  diag "Prereq versions:", map {sprintf('%*s %*s',$vl,$_->[0],$ml,$_->[1])} @reports;
+  diag "Prereq versions:", map {sprintf('  %*s %*s',$vl,$_->[0],$ml,$_->[1])} @reports;
 }
 
 pass;
