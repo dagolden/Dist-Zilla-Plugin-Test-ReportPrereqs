@@ -6,7 +6,7 @@ Dist::Zilla::Plugin::Test::ReportPrereqs - Report on prerequisite versions durin
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -20,9 +20,8 @@ AUTOMATED_TESTING is true, it reports the version of all modules listed in the
 distribution metadata prerequisites (including 'recommends', 'suggests', etc.).
 
 If a MYMETA.json file exists and L<CPAN::Meta> is installed on the testing
-machine, MYMETA.json will be examined for prerequisites as it would include any
-dynamic prerequisites.  Otherwise, a static list of prerequisites is used,
-generated when distribution tarball was built.
+machine, MYMETA.json will be examined for prerequisites in addition, as it
+would include any dynamic prerequisites not set in the distribution metadata.
 
 Versions are reported based on the result of C<parse_version> from
 L<ExtUtils::MakeMaker>, which means prerequisite modules are not actually
