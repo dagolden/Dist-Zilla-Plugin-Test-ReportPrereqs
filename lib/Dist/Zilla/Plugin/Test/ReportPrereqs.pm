@@ -14,6 +14,22 @@ use Moose;
 extends 'Dist::Zilla::Plugin::InlineFiles';
 with 'Dist::Zilla::Role::AfterBuild';
 
+sub mvp_multivalue_args {
+  return qw( include exclude );
+}
+
+foreach my $attr ( qw( include exclude ) ){
+  has "${attr}s" => (
+    init_arg => $attr,
+    is       => 'ro',
+    traits   => ['Array'],
+    default  => sub { [] },
+    handles  => {
+      "${attr}d_modules" => 'elements',
+    },
+  );
+}
+
 sub after_build {
   my ($self, $opt) = @_;
   my $build_root = $opt->{build_root};
@@ -28,6 +44,14 @@ sub _module_list {
   my $self = shift;
   my $prereqs = $self->zilla->prereqs->as_string_hash;
   my %uniq = map {$_ => 1} map { keys %$_ } map { values %$_ } values %$prereqs;
+
+  if( my @includes = $self->included_modules ){
+    @uniq{ @includes } = (1) x @includes;
+  }
+  if( my @excludes = $self->excluded_modules ){
+    delete @uniq{ @excludes };
+  }
+
   return sort keys %uniq; ## no critic
 }
 
@@ -36,6 +60,7 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 =for Pod::Coverage after_build
+mvp_multivalue_args
 
 =head1 SYNOPSIS
 
