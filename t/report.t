@@ -35,6 +35,10 @@ sub capture_test_results {
     my ($out, $err, $total, $failed) = capture_test_results($tzil->built_in);
     is($total->{ok}, 1, 'test passed') or diag "STDOUT:\n", $out, "STDERR:\n", $err, "\n";
     like( $err, qr/Prerequisite Report/, "Saw report header" );
+    like( $err, qr/\bFile::Basename\b/, "prereq reported" );
+    like( $err, qr/\bAn::Extra::Module::That::Causes::Problems\b/, "module included" );
+    like( $err, qr/\bAn::Extra::Module::That::Causes::More::Problems\b/, "multiple modules included" );
+    unlike( $err, qr/\bSecretly::Used::Module\b/, "module excluded" );
 }
 
 {
