@@ -83,6 +83,19 @@ loaded (which avoids various edge cases with certain modules). Parse errors are
 reported as "undef".  If a module is not installed, "missing" is reported
 instead of a version string.
 
+=head1 CONFIGURATION
+
+=head2 include
+
+An C<include> attribute can be specified (multiple times) to add modules
+to the report.  This can be useful if there is a module in the dependency
+chain that is problematic but is not directly required by this project.
+
+=head2 exclude
+
+An C<exclude> attribute can be specified (multiple times) to remove
+modules from the report (if you had a reason to do so).
+
 =head1 SEE ALSO
 
 Other Dist::Zilla::Plugins do similar things in slightly different ways that didn't
