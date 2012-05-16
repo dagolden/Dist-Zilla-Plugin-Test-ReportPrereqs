@@ -59,13 +59,16 @@ __PACKAGE__->meta->make_immutable;
 
 1;
 
-=for Pod::Coverage after_build
+=for Pod::Coverage
+after_build
 mvp_multivalue_args
 
 =head1 SYNOPSIS
 
   # in dist.ini
   [Test::ReportPrereqs]
+  include = Acme::FYI
+  exclude = Acme::Dont::Care
 
 =head1 DESCRIPTION
 

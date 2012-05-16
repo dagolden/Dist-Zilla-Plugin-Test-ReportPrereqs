@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120630",
    "license" : [
       "apache_2_0"
    ],
@@ -59,7 +59,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::Test::ReportPrereqs" : {
          "file" : "lib/Dist/Zilla/Plugin/Test/ReportPrereqs.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -75,6 +75,6 @@
          "web" : "https://github.com/dagolden/dist-zilla-plugin-test-reportprereqs"
       }
    },
-   "version" : "0.003"
+   "version" : "0.004"
 }
 
