@@ -2,6 +2,8 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+0.004     2012-05-16 11:33:16 America/New_York
+
   [Added]
 
   - New 'include' and 'exclude' attributes may be used to add additional
