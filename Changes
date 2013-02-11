@@ -2,6 +2,8 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+0.005     2013-02-11 12:26:51 America/New_York
+
   [Changed]
 
   - Always reports, regardless of AUTOMATED_TESTING; this way even
