@@ -6,7 +6,7 @@ Dist::Zilla::Plugin::Test::ReportPrereqs - Report on prerequisite versions durin
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -17,9 +17,9 @@ version 0.004
 
 =head1 DESCRIPTION
 
-This L<Dist::Zilla> plugin adds a t/00-report-prereqs.t test file.  If
-AUTOMATED_TESTING is true, it reports the version of all modules listed in the
-distribution metadata prerequisites (including 'recommends', 'suggests', etc.).
+This L<Dist::Zilla> plugin adds a t/00-report-prereqs.t test file. It reports
+the version of all modules listed in the distribution metadata prerequisites
+(including 'recommends', 'suggests', etc.).
 
 If a MYMETA.json file exists and L<CPAN::Meta> is installed on the testing
 machine, MYMETA.json will be examined for prerequisites in addition, as it
@@ -75,7 +75,7 @@ L<Dist::Zilla::Plugin::Test::ReportVersions::Tiny> -- static list only, loads mo
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-ReportPrereqs>.
+at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-ReportPrereqs>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -85,7 +85,7 @@ public review and contribution under the terms of the license.
 
 L<https://github.com/dagolden/dist-zilla-plugin-test-reportprereqs>
 
-  git clone https://github.com/dagolden/dist-zilla-plugin-test-reportprereqs.git
+  git clone git://github.com/dagolden/dist-zilla-plugin-test-reportprereqs.git
 
 =head1 AUTHOR
 

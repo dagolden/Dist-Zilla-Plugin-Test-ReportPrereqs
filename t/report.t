@@ -31,7 +31,6 @@ sub capture_test_results {
     ok($tzil, "created test dist");
 
     $tzil->build_in;
-    local $ENV{AUTOMATED_TESTING} = 1;
     my ($out, $err, $total, $failed) = capture_test_results($tzil->built_in);
     is($total->{ok}, 1, 'test passed') or diag "STDOUT:\n", $out, "STDERR:\n", $err, "\n";
     like( $err, qr/Prerequisite Report/, "Saw report header" );
@@ -39,19 +38,6 @@ sub capture_test_results {
     like( $err, qr/\bAn::Extra::Module::That::Causes::Problems\b/, "module included" );
     like( $err, qr/\bAn::Extra::Module::That::Causes::More::Problems\b/, "multiple modules included" );
     unlike( $err, qr/\bSecretly::Used::Module\b/, "module excluded" );
-}
-
-{
-    my $tzil = Dist::Zilla::Tester->from_config(
-        { dist_root => $root },
-    );
-    ok($tzil, "created test dist");
-
-    $tzil->build_in;
-    local $ENV{AUTOMATED_TESTING} = 0;
-    my ($out, $err, $total, $failed) = capture_test_results($tzil->built_in);
-    is($total->{skipped}, 1, 'test skipped') or diag "STDOUT:\n", $out, "STDERR:\n", $err, "\n";
-    like( $out, qr/skipped.*AUTOMATED_TESTING/, "Saw skipped message" );
 }
 
 done_testing;

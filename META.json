@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "apache_2_0"
    ],
@@ -30,6 +30,14 @@
             "ExtUtils::MakeMaker" : "6.30"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Dist::Zilla" : "4",
@@ -47,9 +55,11 @@
          "requires" : {
             "Capture::Tiny" : "0",
             "Dist::Zilla::Tester" : "0",
+            "ExtUtils::MakeMaker" : "0",
             "File::Find" : "0",
             "File::Temp" : "0",
             "File::pushd" : "0",
+            "List::Util" : "0",
             "Path::Class" : "0",
             "Test::Harness" : "0",
             "Test::More" : "0.96"
@@ -59,22 +69,22 @@
    "provides" : {
       "Dist::Zilla::Plugin::Test::ReportPrereqs" : {
          "file" : "lib/Dist/Zilla/Plugin/Test/ReportPrereqs.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-dist-zilla-plugin-test-reportprereqs at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-ReportPrereqs"
+         "mailto" : "bug-Dist-Zilla-Plugin-Test-ReportPrereqs@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-ReportPrereqs"
       },
-      "homepage" : "https://github.com/dagolden/dist-zilla-plugin-test-reportprereqs",
+      "homepage" : "https://metacpan.org/release/Dist-Zilla-Plugin-Test-ReportPrereqs",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/dagolden/dist-zilla-plugin-test-reportprereqs.git",
+         "url" : "git://github.com/dagolden/dist-zilla-plugin-test-reportprereqs.git",
          "web" : "https://github.com/dagolden/dist-zilla-plugin-test-reportprereqs"
       }
    },
-   "version" : "0.004"
+   "version" : "0.005"
 }
 

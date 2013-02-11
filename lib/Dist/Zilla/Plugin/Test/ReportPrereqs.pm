@@ -72,9 +72,9 @@ mvp_multivalue_args
 
 =head1 DESCRIPTION
 
-This L<Dist::Zilla> plugin adds a t/00-report-prereqs.t test file.  If
-AUTOMATED_TESTING is true, it reports the version of all modules listed in the
-distribution metadata prerequisites (including 'recommends', 'suggests', etc.).
+This L<Dist::Zilla> plugin adds a t/00-report-prereqs.t test file. It reports
+the version of all modules listed in the distribution metadata prerequisites
+(including 'recommends', 'suggests', etc.).
 
 If a MYMETA.json file exists and L<CPAN::Meta> is installed on the testing
 machine, MYMETA.json will be examined for prerequisites in addition, as it
@@ -118,18 +118,11 @@ ___[ t/00-report-prereqs.t ]___
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 1;
 
 use ExtUtils::MakeMaker;
 use File::Spec::Functions;
 use List::Util qw/max/;
-
-if ( $ENV{AUTOMATED_TESTING} ) {
-  plan tests => 1;
-}
-else {
-  plan skip_all => '$ENV{AUTOMATED_TESTING} not set';
-}
 
 my @modules = qw(
 INSERT_MODULE_LIST_HERE
