@@ -2,6 +2,8 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+0.006     2013-02-12 17:48:57 America/New_York
+
   [Fixed]
 
   - Don't report on 'develop' prereqs
