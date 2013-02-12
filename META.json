@@ -69,7 +69,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::Test::ReportPrereqs" : {
          "file" : "lib/Dist/Zilla/Plugin/Test/ReportPrereqs.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -85,6 +85,6 @@
          "web" : "https://github.com/dagolden/dist-zilla-plugin-test-reportprereqs"
       }
    },
-   "version" : "0.005"
+   "version" : "0.006"
 }
 

@@ -6,7 +6,7 @@ Dist::Zilla::Plugin::Test::ReportPrereqs - Report on prerequisite versions durin
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -19,7 +19,8 @@ version 0.005
 
 This L<Dist::Zilla> plugin adds a t/00-report-prereqs.t test file. It reports
 the version of all modules listed in the distribution metadata prerequisites
-(including 'recommends', 'suggests', etc.).
+(including 'recommends', 'suggests', etc.).  However, any 'develop' prereqs
+are not reported (unless they show up in another category).
 
 If a MYMETA.json file exists and L<CPAN::Meta> is installed on the testing
 machine, MYMETA.json will be examined for prerequisites in addition, as it
