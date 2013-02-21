@@ -109,7 +109,7 @@ suit my style and needs.
 =for :list
 * L<Dist::Zilla::Plugin::Test::PrereqsFromMeta> -- requires prereqs to be satisfied
 * L<Dist::Zilla::Plugin::Test::ReportVersions> -- bundles a copy of YAML::Tiny, reads prereqs only from META.yml, and attempts to load them with C<require>
-* L<Dist::Zilla::Plugin::Test::ReportVersions::Tiny> -- static list only, loads modules with C<require>
+* L<Dist::Zilla::Plugin::ReportVersions::Tiny> -- static list only, loads modules with C<require>
 
 =cut
 
