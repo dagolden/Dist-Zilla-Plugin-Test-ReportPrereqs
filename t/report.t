@@ -8,6 +8,7 @@ use Dist::Zilla::Tester;
 use File::pushd qw/pushd/;
 use Path::Class;
 use Test::Harness;
+use Cwd;
 
 my $test_file = file(qw(t 00-report-prereqs.t));
 my $root = 'corpus/DZ';
@@ -31,6 +32,12 @@ sub capture_test_results {
     ok($tzil, "created test dist");
 
     $tzil->build_in;
+
+    my $cwd = getcwd;
+    chdir $tzil->tempdir->subdir('build');
+    system($^X, 'Makefile.PL'); # create MYMETA.json
+    chdir $cwd;
+
     my ($out, $err, $total, $failed) = capture_test_results($tzil->built_in);
     is($total->{ok}, 1, 'test passed') or diag "STDOUT:\n", $out, "STDERR:\n", $err, "\n";
     like( $err, qr/Prerequisite Report/, "Saw report header" );
@@ -38,6 +45,7 @@ sub capture_test_results {
     like( $err, qr/\bAn::Extra::Module::That::Causes::Problems\b/, "module included" );
     like( $err, qr/\bAn::Extra::Module::That::Causes::More::Problems\b/, "multiple modules included" );
     unlike( $err, qr/\bSecretly::Used::Module\b/, "module excluded" );
+    like( $err, qr/\bWARNING\b.*The following.*'Missing::Prereq' is not installed\b/s, "warning issued when missing prereqs detected" );
 }
 
 done_testing;
