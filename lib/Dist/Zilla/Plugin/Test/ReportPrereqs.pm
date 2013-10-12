@@ -15,54 +15,52 @@ extends 'Dist::Zilla::Plugin::InlineFiles';
 with 'Dist::Zilla::Role::AfterBuild';
 
 sub mvp_multivalue_args {
-  return qw( include exclude );
+    return qw( include exclude );
 }
 
-foreach my $attr ( qw( include exclude ) ){
-  has "${attr}s" => (
-    init_arg => $attr,
-    is       => 'ro',
-    traits   => ['Array'],
-    default  => sub { [] },
-    handles  => {
-      "${attr}d_modules" => 'elements',
-    },
-  );
+foreach my $attr (qw( include exclude )) {
+    has "${attr}s" => (
+        init_arg => $attr,
+        is       => 'ro',
+        traits   => ['Array'],
+        default  => sub { [] },
+        handles  => { "${attr}d_modules" => 'elements', },
+    );
 }
 
 has verify_prereqs => (
-  is      => 'ro',
-  isa     => 'Bool',
-  default => 1,
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 1,
 );
 
 sub after_build {
-  my ($self, $opt) = @_;
-  my $build_root = $opt->{build_root};
-  my $test_file = catfile($build_root, qw/t 00-report-prereqs.t/);
-  my $guts = read_file($test_file);
-  my $list = join("\n", map { "  $_" } $self->_module_list);
-  $guts =~ s{INSERT_VERSION_HERE}{$self->VERSION || '<self>'}e;
-  $guts =~ s{INSERT_MODULE_LIST_HERE}{$list};
-  $guts =~ s{INSERT_EXCLUDED_MODULES_HERE}{join(' ', $self->excluded_modules)}ge;
-  $guts =~ s{INSERT_VERIFY_PREREQS_CONFIG}{$self->verify_prereqs ? 1 : 0}ge;
-  write_file($test_file, $guts);
+    my ( $self, $opt ) = @_;
+    my $build_root = $opt->{build_root};
+    my $test_file  = catfile( $build_root, qw/t 00-report-prereqs.t/ );
+    my $guts       = read_file($test_file);
+    my $list       = join( "\n", map { "  $_" } $self->_module_list );
+    $guts =~ s{INSERT_VERSION_HERE}{$self->VERSION || '<self>'}e;
+    $guts =~ s{INSERT_MODULE_LIST_HERE}{$list};
+    $guts =~ s{INSERT_EXCLUDED_MODULES_HERE}{join(' ', $self->excluded_modules)}ge;
+    $guts =~ s{INSERT_VERIFY_PREREQS_CONFIG}{$self->verify_prereqs ? 1 : 0}ge;
+    write_file( $test_file, $guts );
 }
 
 sub _module_list {
-  my $self = shift;
-  my $prereqs = $self->zilla->prereqs->as_string_hash;
-  delete $prereqs->{develop} if not $ENV{AUTHOR_TESTING};
-  my %uniq = map {$_ => 1} map { keys %$_ } map { values %$_ } values %$prereqs;
+    my $self    = shift;
+    my $prereqs = $self->zilla->prereqs->as_string_hash;
+    delete $prereqs->{develop} if not $ENV{AUTHOR_TESTING};
+    my %uniq = map { $_ => 1 } map { keys %$_ } map { values %$_ } values %$prereqs;
 
-  if( my @includes = $self->included_modules ){
-    @uniq{ @includes } = (1) x @includes;
-  }
-  if( my @excludes = $self->excluded_modules ){
-    delete @uniq{ @excludes };
-  }
+    if ( my @includes = $self->included_modules ) {
+        @uniq{@includes} = (1) x @includes;
+    }
+    if ( my @excludes = $self->excluded_modules ) {
+        delete @uniq{@excludes};
+    }
 
-  return sort keys %uniq; ## no critic
+    return sort keys %uniq; ## no critic
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -114,7 +112,7 @@ chain that is problematic but is not directly required by this project.
 An C<exclude> attribute can be specified (multiple times) to remove
 modules from the report (if you had a reason to do so).
 
-=head verify_prereqs
+=head2 verify_prereqs
 
 When set, installed versions of all 'requires' prerequisites are verified
 against those specified.  Defaults to true.
