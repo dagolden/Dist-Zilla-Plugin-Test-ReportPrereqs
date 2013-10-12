@@ -73,13 +73,13 @@ mvp_multivalue_args
 
 =head1 DESCRIPTION
 
-This L<Dist::Zilla> plugin adds a t/00-report-prereqs.t test file. It reports
+This L<Dist::Zilla> plugin adds a F<t/00-report-prereqs.t> test file. It reports
 the version of all modules listed in the distribution metadata prerequisites
 (including 'recommends', 'suggests', etc.).  However, any 'develop' prereqs
 are not reported (unless they show up in another category).
 
-If a MYMETA.json file exists and L<CPAN::Meta> is installed on the testing
-machine, MYMETA.json will be examined for prerequisites in addition, as it
+If a F<MYMETA.json> file exists and L<CPAN::Meta> is installed on the testing
+machine, F<MYMETA.json> will be examined for prerequisites in addition, as it
 would include any dynamic prerequisites not set in the distribution metadata.
 
 Versions are reported based on the result of C<parse_version> from
