@@ -35,7 +35,7 @@ sub capture_test_results {
 
     my $cwd = getcwd;
     chdir $tzil->tempdir->subdir('build');
-    system($^X, 'Makefile.PL'); # create MYMETA.json
+    capture { system($^X, 'Makefile.PL') }; # create MYMETA.json 
     chdir $cwd;
 
     my ($out, $err, $total, $failed) = capture_test_results($tzil->built_in);
