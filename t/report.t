@@ -45,6 +45,7 @@ sub capture_test_results {
     like( $err, qr/\bAn::Extra::Module::That::Causes::Problems\b/, "module included" );
     like( $err, qr/\bAn::Extra::Module::That::Causes::More::Problems\b/, "multiple modules included" );
     unlike( $err, qr/\bSecretly::Used::Module\b/, "module excluded" );
+    like( $err, qr/\bWARNING\b.*The following.*'Missing::Prereq' is not installed\b/s, "warning issued when missing prereqs detected" );
 }
 
 done_testing;

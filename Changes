@@ -6,6 +6,11 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
   - 'exclude' option now respected when MYMETA.json is present
 
+  [Changed]
+
+  - now (optionally) reporting on any missing prereqs after listing all module
+    versions [Karen Etheridge]
+
 0.006     2013-02-12 17:48:57 America/New_York
 
   [Fixed]

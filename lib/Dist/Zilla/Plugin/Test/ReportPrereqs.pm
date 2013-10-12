@@ -30,6 +30,12 @@ foreach my $attr ( qw( include exclude ) ){
   );
 }
 
+has verify_prereqs => (
+  is      => 'ro',
+  isa     => 'Bool',
+  default => 1,
+);
+
 sub after_build {
   my ($self, $opt) = @_;
   my $build_root = $opt->{build_root};
@@ -38,7 +44,8 @@ sub after_build {
   my $list = join("\n", map { "  $_" } $self->_module_list);
   $guts =~ s{INSERT_VERSION_HERE}{$self->VERSION || '<self>'}e;
   $guts =~ s{INSERT_MODULE_LIST_HERE}{$list};
-  $guts =~ s{INSERT_EXCLUDED_MODULES_HERE}{join(' ', $self->excluded_modules)}e;
+  $guts =~ s{INSERT_EXCLUDED_MODULES_HERE}{join(' ', $self->excluded_modules)}ge;
+  $guts =~ s{INSERT_VERIFY_PREREQS_CONFIG}{$self->verify_prereqs ? 1 : 0}e;
   write_file($test_file, $guts);
 }
 
@@ -90,6 +97,8 @@ loaded (which avoids various edge cases with certain modules). Parse errors are
 reported as "undef".  If a module is not installed, "missing" is reported
 instead of a version string.
 
+Additionally, any unfulfilled prerequisites are reported after the list of all versions.
+
 =head1 CONFIGURATION
 
 =head2 include
@@ -102,6 +111,11 @@ chain that is problematic but is not directly required by this project.
 
 An C<exclude> attribute can be specified (multiple times) to remove
 modules from the report (if you had a reason to do so).
+
+=head verify_prereqs
+
+When set, installed versions of all prerequisites are verified against those specified.
+Defaults to true.
 
 =head1 SEE ALSO
 
@@ -137,13 +151,14 @@ INSERT_MODULE_LIST_HERE
 # replace modules with dynamic results from MYMETA.json if we can
 # (hide CPAN::Meta from prereq scanner)
 my $cpan_meta = "CPAN::Meta";
+my $meta;
 if ( -f "MYMETA.json" && eval "require $cpan_meta" ) { ## no critic
-  if ( my $meta = eval { CPAN::Meta->load_file("MYMETA.json") } ) {
+  if ( $meta = eval { CPAN::Meta->load_file("MYMETA.json") } ) {
     my $prereqs = $meta->prereqs;
     delete $prereqs->{develop};
     my %uniq = map {$_ => 1} map { keys %$_ } map { values %$_ } values %$prereqs;
     $uniq{$_} = 1 for @modules; # don't lose any static ones
-    delete @uniq{qw( INSERT_EXCLUDED_MODULES_HERE )};
+    delete @uniq{qw/ INSERT_EXCLUDED_MODULES_HERE /};
     @modules = sort keys %uniq;
   }
 }
@@ -171,6 +186,24 @@ if ( @reports ) {
   my $ml = max map { length $_->[1] } @reports;
   splice @reports, 1, 0, ["-" x $vl, "-" x $ml];
   diag "Prerequisite Report:\n", map {sprintf("  %*s %*s\n",$vl,$_->[0],-$ml,$_->[1])} @reports;
+}
+
+if (INSERT_VERIFY_PREREQS_CONFIG && eval "require CPAN::Meta::Check; CPAN::Meta::Check->VERSION(0.007); 1") {
+  $meta ||= eval { CPAN::Meta->load_file("META.json") } if -f "META.json" && eval "require $cpan_meta";
+  if ($meta) {
+    my $reqs = CPAN::Meta::Check::requirements_for($meta, [qw/configure build runtime test/], 'requires');
+    my $ret = CPAN::Meta::Check::check_requirements($reqs, 'requires');
+
+    delete @{$ret}{qw/ INSERT_EXCLUDED_MODULES_HERE /};
+
+    if (my @unsatisfied = grep { defined } values %$ret) {
+      diag join("\n",
+        "\n*** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***\n",
+        "The following unfulfilled prerequisites have been detected:\n",
+        @unsatisfied,
+      );
+    }
+  }
 }
 
 pass;
