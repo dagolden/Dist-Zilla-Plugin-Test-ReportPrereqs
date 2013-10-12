@@ -52,7 +52,7 @@ sub after_build {
 sub _module_list {
   my $self = shift;
   my $prereqs = $self->zilla->prereqs->as_string_hash;
-  delete $prereqs->{develop};
+  delete $prereqs->{develop} if not $ENV{AUTHOR_TESTING};
   my %uniq = map {$_ => 1} map { keys %$_ } map { values %$_ } values %$prereqs;
 
   if( my @includes = $self->included_modules ){
@@ -191,7 +191,9 @@ if ( @reports ) {
 if (INSERT_VERIFY_PREREQS_CONFIG && eval "require CPAN::Meta::Check; CPAN::Meta::Check->VERSION(0.007); 1") {
   $meta ||= eval { CPAN::Meta->load_file("META.json") } if -f "META.json" && eval "require $cpan_meta";
   if ($meta) {
-    my $reqs = CPAN::Meta::Check::requirements_for($meta, [qw/configure build runtime test/], 'requires');
+    my @types = qw/configure build runtime test/;
+    push @types, 'develop' if $ENV{AUTHOR_TESTING};
+    my $reqs = CPAN::Meta::Check::requirements_for($meta, \@types, 'requires');
     my $ret = CPAN::Meta::Check::check_requirements($reqs, 'requires');
 
     delete @{$ret}{qw/ INSERT_EXCLUDED_MODULES_HERE /};
