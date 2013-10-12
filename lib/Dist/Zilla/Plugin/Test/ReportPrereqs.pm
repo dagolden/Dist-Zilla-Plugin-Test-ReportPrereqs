@@ -45,7 +45,7 @@ sub after_build {
   $guts =~ s{INSERT_VERSION_HERE}{$self->VERSION || '<self>'}e;
   $guts =~ s{INSERT_MODULE_LIST_HERE}{$list};
   $guts =~ s{INSERT_EXCLUDED_MODULES_HERE}{join(' ', $self->excluded_modules)}ge;
-  $guts =~ s{INSERT_VERIFY_PREREQS_CONFIG}{$self->verify_prereqs ? 1 : 0}e;
+  $guts =~ s{INSERT_VERIFY_PREREQS_CONFIG}{$self->verify_prereqs ? 1 : 0}ge;
   write_file($test_file, $guts);
 }
 
@@ -97,7 +97,9 @@ loaded (which avoids various edge cases with certain modules). Parse errors are
 reported as "undef".  If a module is not installed, "missing" is reported
 instead of a version string.
 
-Additionally, any unfulfilled prerequisites are reported after the list of all versions.
+Additionally, if L<CPAN::Meta> is installed, unfulfilled required prerequisites
+are reported after the list of all versions based on either F<MYMETA>
+(preferably) or F<META> (fallback).
 
 =head1 CONFIGURATION
 
@@ -114,8 +116,8 @@ modules from the report (if you had a reason to do so).
 
 =head verify_prereqs
 
-When set, installed versions of all prerequisites are verified against those specified.
-Defaults to true.
+When set, installed versions of all 'requires' prerequisites are verified
+against those specified.  Defaults to true.
 
 =head1 SEE ALSO
 
@@ -148,22 +150,44 @@ my @modules = qw(
 INSERT_MODULE_LIST_HERE
 );
 
+my %exclude = map {; $_ => 1 } qw(
+INSERT_EXCLUDED_MODULES_HERE
+);
+
+my ($source) = grep { -f $_ } qw/MYMETA.json MYMETA.yml META.json/;
+$source = "META.yml" unless defined $source;
+
 # replace modules with dynamic results from MYMETA.json if we can
 # (hide CPAN::Meta from prereq scanner)
 my $cpan_meta = "CPAN::Meta";
-my $meta;
-if ( -f "MYMETA.json" && eval "require $cpan_meta" ) { ## no critic
-  if ( $meta = eval { CPAN::Meta->load_file("MYMETA.json") } ) {
+my $cpan_meta_req = "CPAN::Meta::Requirements";
+my $all_requires;
+if ( -f $source && eval "require $cpan_meta" ) { ## no critic
+  if ( my $meta = eval { CPAN::Meta->load_file($source) } ) {
+
+    # Get ALL modules mentioned in META (any phase/type)
     my $prereqs = $meta->prereqs;
-    delete $prereqs->{develop};
+    delete $prereqs->{develop} if not $ENV{AUTHOR_TESTING};
     my %uniq = map {$_ => 1} map { keys %$_ } map { values %$_ } values %$prereqs;
     $uniq{$_} = 1 for @modules; # don't lose any static ones
-    delete @uniq{qw/ INSERT_EXCLUDED_MODULES_HERE /};
-    @modules = sort keys %uniq;
+    @modules = sort grep { ! $exclude{$_} } keys %uniq;
+
+    # If verifying, merge 'requires' only for major phases
+    if ( INSERT_VERIFY_PREREQS_CONFIG ) {
+      $prereqs = $meta->effective_prereqs; # get the object, not the hash
+      eval "require $cpan_meta_req"; ## no critic
+      $all_requires = CPAN::Meta::Requirements->new;
+      for my $phase ( qw/configure build test runtime/ ) {
+        $all_requires->add_requirements(
+          $prereqs->requirements_for($phase, 'requires')
+        );
+      }
+    }
   }
 }
 
 my @reports = [qw/Version Module/];
+my @dep_errors;
 
 for my $mod ( @modules ) {
   next if $mod eq 'perl';
@@ -175,9 +199,29 @@ for my $mod ( @modules ) {
     my $ver = MM->parse_version( catfile($prefix, $file) );
     $ver = "undef" unless defined $ver; # Newer MM should do this anyway
     push @reports, [$ver, $mod];
+
+    if ( INSERT_VERIFY_PREREQS_CONFIG && $all_requires ) {
+      my $req = $all_requires->requirements_for_module($mod);
+      if ( defined $req && length $req ) {
+        if ( ! eval { version->parse($ver) } ) {
+          push @dep_errors, "$mod version '$ver' cannot be parsed (version '$req' required)";
+        }
+        elsif ( ! $all_requires->accepts_module( $mod => $ver ) ) {
+          push @dep_errors, "$mod version '$ver' is not in required range '$req'";
+        }
+      }
+    }
+
   }
   else {
     push @reports, ["missing", $mod];
+
+    if ( INSERT_VERIFY_PREREQS_CONFIG && $all_requires ) {
+      my $req = $all_requires->requirements_for_module($mod);
+      if ( defined $req && length $req ) {
+        push @dep_errors, "$mod is not installed (version '$req' required)";
+      }
+    }
   }
 }
 
@@ -185,27 +229,17 @@ if ( @reports ) {
   my $vl = max map { length $_->[0] } @reports;
   my $ml = max map { length $_->[1] } @reports;
   splice @reports, 1, 0, ["-" x $vl, "-" x $ml];
-  diag "Prerequisite Report:\n", map {sprintf("  %*s %*s\n",$vl,$_->[0],-$ml,$_->[1])} @reports;
+  diag "Versions for all modules listed in $source (including optional ones):\n",
+    map {sprintf("  %*s %*s\n",$vl,$_->[0],-$ml,$_->[1])} @reports;
 }
 
-if (INSERT_VERIFY_PREREQS_CONFIG && eval "require CPAN::Meta::Check; CPAN::Meta::Check->VERSION(0.007); 1") {
-  $meta ||= eval { CPAN::Meta->load_file("META.json") } if -f "META.json" && eval "require $cpan_meta";
-  if ($meta) {
-    my @types = qw/configure build runtime test/;
-    push @types, 'develop' if $ENV{AUTHOR_TESTING};
-    my $reqs = CPAN::Meta::Check::requirements_for($meta, \@types, 'requires');
-    my $ret = CPAN::Meta::Check::check_requirements($reqs, 'requires');
-
-    delete @{$ret}{qw/ INSERT_EXCLUDED_MODULES_HERE /};
-
-    if (my @unsatisfied = grep { defined } values %$ret) {
-      diag join("\n",
-        "\n*** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***\n",
-        "The following unfulfilled prerequisites have been detected:\n",
-        @unsatisfied,
-      );
-    }
-  }
+if ( @dep_errors ) {
+  diag join("\n",
+    "\n*** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***\n",
+    "The following REQUIRED prerequisites were not satisfied:\n",
+    @dep_errors,
+    "\n"
+  );
 }
 
 pass;
