@@ -2,6 +2,10 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+  [Fixed]
+
+  - 'exclude' option now respected when MYMETA.json is present
+
 0.006     2013-02-12 17:48:57 America/New_York
 
   [Fixed]

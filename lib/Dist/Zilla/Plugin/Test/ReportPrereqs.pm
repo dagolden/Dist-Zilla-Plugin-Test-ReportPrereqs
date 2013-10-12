@@ -38,6 +38,7 @@ sub after_build {
   my $list = join("\n", map { "  $_" } $self->_module_list);
   $guts =~ s{INSERT_VERSION_HERE}{$self->VERSION || '<self>'}e;
   $guts =~ s{INSERT_MODULE_LIST_HERE}{$list};
+  $guts =~ s{INSERT_EXCLUDED_MODULES_HERE}{join(' ', $self->excluded_modules)}e;
   write_file($test_file, $guts);
 }
 
@@ -142,6 +143,7 @@ if ( -f "MYMETA.json" && eval "require $cpan_meta" ) { ## no critic
     delete $prereqs->{develop};
     my %uniq = map {$_ => 1} map { keys %$_ } map { values %$_ } values %$prereqs;
     $uniq{$_} = 1 for @modules; # don't lose any static ones
+    delete @uniq{qw( INSERT_EXCLUDED_MODULES_HERE )};
     @modules = sort keys %uniq;
   }
 }
