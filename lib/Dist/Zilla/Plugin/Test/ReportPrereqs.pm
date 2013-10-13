@@ -173,12 +173,13 @@ if ( -f $source && eval "require $cpan_meta" ) { ## no critic
     # If verifying, merge 'requires' only for major phases
     if ( INSERT_VERIFY_PREREQS_CONFIG ) {
       $prereqs = $meta->effective_prereqs; # get the object, not the hash
-      eval "require $cpan_meta_req"; ## no critic
-      $all_requires = CPAN::Meta::Requirements->new;
-      for my $phase ( qw/configure build test runtime/ ) {
-        $all_requires->add_requirements(
-          $prereqs->requirements_for($phase, 'requires')
-        );
+      if (eval "require $cpan_meta_req; 1") { ## no critic
+        $all_requires = $cpan_meta_req->new;
+        for my $phase ( qw/configure build test runtime/ ) {
+          $all_requires->add_requirements(
+            $prereqs->requirements_for($phase, 'requires')
+          );
+        }
       }
     }
   }
@@ -198,7 +199,7 @@ for my $mod ( @modules ) {
     $ver = "undef" unless defined $ver; # Newer MM should do this anyway
     push @reports, [$ver, $mod];
 
-    if ( INSERT_VERIFY_PREREQS_CONFIG && $all_requires ) {
+    if ( INSERT_VERIFY_PREREQS_CONFIG && $all_requires && eval "$cpan_meta_req->VERSION(2.120920); 1") {
       my $req = $all_requires->requirements_for_module($mod);
       if ( defined $req && length $req ) {
         if ( ! eval { version->parse($ver) } ) {
