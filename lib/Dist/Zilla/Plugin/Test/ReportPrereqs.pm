@@ -187,6 +187,7 @@ if ( -f $source && eval "require $cpan_meta" ) { ## no critic
 
 my @reports = [qw/Version Module/];
 my @dep_errors;
+my $req_hash = defined($all_requires) ? $all_requires->as_string_hash : {};
 
 for my $mod ( @modules ) {
   next if $mod eq 'perl';
@@ -199,8 +200,8 @@ for my $mod ( @modules ) {
     $ver = "undef" unless defined $ver; # Newer MM should do this anyway
     push @reports, [$ver, $mod];
 
-    if ( INSERT_VERIFY_PREREQS_CONFIG && $all_requires && eval "$cpan_meta_req->VERSION(2.120920); 1") {
-      my $req = $all_requires->requirements_for_module($mod);
+    if ( INSERT_VERIFY_PREREQS_CONFIG && $all_requires ) {
+      my $req = $req_hash->{$mod};
       if ( defined $req && length $req ) {
         if ( ! eval { version->parse($ver) } ) {
           push @dep_errors, "$mod version '$ver' cannot be parsed (version '$req' required)";
@@ -216,7 +217,7 @@ for my $mod ( @modules ) {
     push @reports, ["missing", $mod];
 
     if ( INSERT_VERIFY_PREREQS_CONFIG && $all_requires ) {
-      my $req = $all_requires->requirements_for_module($mod);
+      my $req = $req_hash->{$mod};
       if ( defined $req && length $req ) {
         push @dep_errors, "$mod is not installed (version '$req' required)";
       }
