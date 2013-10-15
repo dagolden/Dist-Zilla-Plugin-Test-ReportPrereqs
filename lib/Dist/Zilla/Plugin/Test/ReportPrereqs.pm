@@ -83,6 +83,7 @@ __PACKAGE__->meta->make_immutable;
 =for Pod::Coverage
 after_build
 mvp_multivalue_args
+register_prereqs
 
 =head1 SYNOPSIS
 
