@@ -12,7 +12,8 @@ use File::Spec::Functions;
 
 use Moose;
 extends 'Dist::Zilla::Plugin::InlineFiles';
-with 'Dist::Zilla::Role::AfterBuild';
+with 'Dist::Zilla::Role::AfterBuild',
+    'Dist::Zilla::Role::PrereqSource';
 
 sub mvp_multivalue_args {
     return qw( include exclude );
@@ -33,6 +34,19 @@ has verify_prereqs => (
     isa     => 'Bool',
     default => 1,
 );
+
+sub register_prereqs {
+    my $self    = shift;
+
+    $self->zilla->register_prereqs(
+      {
+        phase => 'test',
+        type  => 'recommends',
+      },
+      'CPAN::Meta' => '0',
+      'CPAN::Meta::Requirements' => 0,
+    );
+}
 
 sub after_build {
     my ( $self, $opt ) = @_;
