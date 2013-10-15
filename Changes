@@ -2,6 +2,11 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+  [Changed]
+
+  - now injecting test-recommends prereqs to enable prereq verification
+    (Karen Etheridge)
+
 0.008     2013-10-13 15:33:03 America/New_York
 
   [Fixed]
