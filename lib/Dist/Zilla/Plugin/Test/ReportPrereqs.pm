@@ -12,8 +12,7 @@ use File::Spec::Functions;
 
 use Moose;
 extends 'Dist::Zilla::Plugin::InlineFiles';
-with 'Dist::Zilla::Role::AfterBuild',
-    'Dist::Zilla::Role::PrereqSource';
+with 'Dist::Zilla::Role::AfterBuild', 'Dist::Zilla::Role::PrereqSource';
 
 sub mvp_multivalue_args {
     return qw( include exclude );
@@ -36,15 +35,15 @@ has verify_prereqs => (
 );
 
 sub register_prereqs {
-    my $self    = shift;
+    my $self = shift;
 
     $self->zilla->register_prereqs(
-      {
-        phase => 'test',
-        type  => 'recommends',
-      },
-      'CPAN::Meta' => '0',
-      'CPAN::Meta::Requirements' => 0,
+        {
+            phase => 'test',
+            type  => 'recommends',
+        },
+        'CPAN::Meta'               => '0',
+        'CPAN::Meta::Requirements' => 0,
     );
 }
 
@@ -243,7 +242,7 @@ if ( @reports ) {
   my $vl = max map { length $_->[0] } @reports;
   my $ml = max map { length $_->[1] } @reports;
   splice @reports, 1, 0, ["-" x $vl, "-" x $ml];
-  diag "Versions for all modules listed in $source (including optional ones):\n",
+  diag "\nVersions for all modules listed in $source (including optional ones):\n",
     map {sprintf("  %*s %*s\n",$vl,$_->[0],-$ml,$_->[1])} @reports;
 }
 
