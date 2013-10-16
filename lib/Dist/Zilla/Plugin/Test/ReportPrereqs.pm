@@ -217,7 +217,7 @@ for my $mod ( @modules ) {
     if ( INSERT_VERIFY_PREREQS_CONFIG && $all_requires ) {
       my $req = $req_hash->{$mod};
       if ( defined $req && length $req ) {
-        if ( ! eval { version->parse($ver) } ) {
+        if ( ! defined eval { version->parse($ver) } ) {
           push @dep_errors, "$mod version '$ver' cannot be parsed (version '$req' required)";
         }
         elsif ( ! $all_requires->accepts_module( $mod => $ver ) ) {
