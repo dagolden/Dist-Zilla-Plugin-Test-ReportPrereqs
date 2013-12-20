@@ -189,7 +189,7 @@ if ( -f $source && eval "require $cpan_meta" ) { ## no critic
       $prereqs = $meta->effective_prereqs; # get the object, not the hash
       if (eval "require $cpan_meta_req; 1") { ## no critic
         $all_requires = $cpan_meta_req->new;
-        for my $phase ( qw/configure build test runtime/ ) {
+        for my $phase ( qw/configure build test runtime develop/ ) {
           $all_requires->add_requirements(
             $prereqs->requirements_for($phase, 'requires')
           );
