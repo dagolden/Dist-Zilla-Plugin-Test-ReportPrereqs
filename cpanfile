@@ -1,9 +1,7 @@
 requires "Dist::Zilla" => "4";
 requires "Dist::Zilla::Plugin::InlineFiles" => "0";
-requires "Dist::Zilla::Role::AfterBuild" => "0";
+requires "Dist::Zilla::Role::InstallTool" => "0";
 requires "Dist::Zilla::Role::PrereqSource" => "0";
-requires "File::Slurp" => "0";
-requires "File::Spec::Functions" => "0";
 requires "Moose" => "0";
 requires "perl" => "5.006";
 requires "strict" => "0";
@@ -14,6 +12,7 @@ on 'test' => sub {
   requires "Cwd" => "0";
   requires "Dist::Zilla::Tester" => "0";
   requires "ExtUtils::MakeMaker" => "0";
+  requires "File::Spec::Functions" => "0";
   requires "File::pushd" => "0";
   requires "List::Util" => "0";
   requires "Path::Class" => "0";
@@ -31,7 +30,7 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
-  requires "Dist::Zilla" => "5.008";
+  requires "Dist::Zilla" => "5.011";
   requires "Dist::Zilla::PluginBundle::DAGOLDEN" => "0.053";
   requires "File::Spec" => "0";
   requires "File::Temp" => "0";
