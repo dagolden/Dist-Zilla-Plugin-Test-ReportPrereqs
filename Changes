@@ -2,6 +2,10 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+  - Modifies the test file with the static prerequisite list
+    in memory during the InstallTool phase rather only on disk in
+    the AfterBuild phase (Kent Fredric)
+
 0.011     2014-01-07 11:46:22 America/New_York
 
   [Fixed]
