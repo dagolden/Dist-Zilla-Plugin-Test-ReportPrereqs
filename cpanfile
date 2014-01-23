@@ -1,3 +1,4 @@
+requires "Data::Dumper" => "0";
 requires "Dist::Zilla" => "4";
 requires "Dist::Zilla::Plugin::InlineFiles" => "0";
 requires "Dist::Zilla::Role::InstallTool" => "0";
@@ -18,11 +19,12 @@ on 'test' => sub {
   requires "Path::Class" => "0";
   requires "Test::Harness" => "0";
   requires "Test::More" => "0.96";
+  requires "version" => "0";
 };
 
 on 'test' => sub {
   recommends "CPAN::Meta" => "0";
-  recommends "CPAN::Meta::Requirements" => "0";
+  recommends "CPAN::Meta::Requirements" => "2.120900";
 };
 
 on 'configure' => sub {
@@ -30,7 +32,7 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
-  requires "Dist::Zilla" => "5.011";
+  requires "Dist::Zilla" => "5.012";
   requires "Dist::Zilla::PluginBundle::DAGOLDEN" => "0.053";
   requires "File::Spec" => "0";
   requires "File::Temp" => "0";
