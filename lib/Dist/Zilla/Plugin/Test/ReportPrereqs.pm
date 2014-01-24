@@ -220,6 +220,9 @@ if ( $source && $HAS_CPAN_META ) {
     }
   }
 }
+else {
+  $source = 'static metadata';
+}
 
 my @modules = sort grep { ! $exclude{$_} } keys %include;
 my @reports = [qw/Version Module/];
