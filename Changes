@@ -2,7 +2,15 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+  [Changed]
+
+  - Embeds the complete static prerequisite hash into the
+    generated file; no longer creates just a static list
+    (that varied based on AUTHOR_TESTING);
+
 0.012     2014-01-14 15:49:18-05:00 America/New_York
+
+  [Changed]
 
   - Modifies the test file with the static prerequisite list
     in memory during the InstallTool phase rather only on disk in
