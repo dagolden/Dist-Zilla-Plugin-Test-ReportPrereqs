@@ -77,7 +77,8 @@ sub _dump_prereqs {
     my $self    = shift;
     my $prereqs = $self->zilla->prereqs->as_string_hash;
     return ("do { my "
-          . Data::Dumper->new( [$prereqs], ['x'] )->Purity(1)->Terse(0)->Dump() . '  $x;'
+          . Data::Dumper->new( [$prereqs], ['x'] )->Purity(1)->Sortkeys(1)->Terse(0)->Dump()
+          . '  $x;'
           . "\n }" );
 }
 
