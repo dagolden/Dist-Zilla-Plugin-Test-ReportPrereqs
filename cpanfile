@@ -1,9 +1,12 @@
 requires "Data::Dumper" => "0";
+requires "Data::Section" => "0.200002";
 requires "Dist::Zilla" => "4";
-requires "Dist::Zilla::Plugin::InlineFiles" => "0";
-requires "Dist::Zilla::Role::InstallTool" => "0";
+requires "Dist::Zilla::File::FromCode" => "0";
+requires "Dist::Zilla::File::InMemory" => "0";
+requires "Dist::Zilla::Role::FileGatherer" => "0";
 requires "Dist::Zilla::Role::PrereqSource" => "0";
 requires "Moose" => "0";
+requires "Sub::Exporter::ForMethods" => "0";
 requires "perl" => "5.006";
 requires "strict" => "0";
 requires "warnings" => "0";
@@ -32,7 +35,7 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
-  requires "Dist::Zilla" => "5.012";
+  requires "Dist::Zilla" => "5";
   requires "Dist::Zilla::PluginBundle::DAGOLDEN" => "0.053";
   requires "File::Spec" => "0";
   requires "File::Temp" => "0";
@@ -43,4 +46,5 @@ on 'develop' => sub {
   requires "Test::More" => "0";
   requires "Test::Pod" => "1.41";
   requires "Test::Pod::Coverage" => "1.08";
+  requires "Test::Spelling" => "0.12";
 };

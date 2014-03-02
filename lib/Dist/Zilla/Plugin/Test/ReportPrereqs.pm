@@ -9,8 +9,12 @@ package Dist::Zilla::Plugin::Test::ReportPrereqs;
 use Dist::Zilla 4 ();
 
 use Moose;
-extends 'Dist::Zilla::Plugin::InlineFiles';
-with 'Dist::Zilla::Role::InstallTool', 'Dist::Zilla::Role::PrereqSource';
+with 'Dist::Zilla::Role::FileGatherer', 'Dist::Zilla::Role::PrereqSource';
+
+use Sub::Exporter::ForMethods;
+use Data::Section 0.200002 # encoding and bytes
+    { installer => Sub::Exporter::ForMethods::method_installer },
+    '-setup';
 
 use Data::Dumper;
 
@@ -47,27 +51,41 @@ sub register_prereqs {
     );
 }
 
+sub gather_files {
+    my $self = shift;
+
+    my $data = $self->merged_section_data;
+    return unless $data and %$data;
+
+    require Dist::Zilla::File::InMemory;
+
+    for my $filename (keys %$data) {
+        $self->add_file(Dist::Zilla::File::InMemory->new({
+            name => $filename,
+            content => $self->_munge_test(${ $data->{$filename} }),
+        }));
+    }
+
+    require Dist::Zilla::File::FromCode;
+    $self->add_file(Dist::Zilla::File::FromCode->new({
+        name => $self->_dump_filename,
+        code => sub { $self->_dump_prereqs },
+    }));
+
+    return;
+}
+
 sub _munge_test {
-    my ( $self, $file ) = @_;
-    my $guts = $file->content;
+    my ( $self, $guts ) = @_;
     $guts =~ s{INSERT_VERSION_HERE}{$self->VERSION || '<self>'}e;
-    $guts =~ s{INSERT_PREREQS_HERE}{$self->_dump_prereqs}e;
+    $guts =~ s{INSERT_DD_FILENAME_HERE}{$self->_dump_filename}e;
     $guts =~ s{INSERT_INCLUDED_MODULES_HERE}{_format_list($self->included_modules)}e;
     $guts =~ s{INSERT_EXCLUDED_MODULES_HERE}{_format_list($self->excluded_modules)}e;
     $guts =~ s{INSERT_VERIFY_PREREQS_CONFIG}{$self->verify_prereqs ? 1 : 0}e;
-    $file->content($guts);
+    return $guts;
 }
 
-sub setup_installer {
-    my ( $self, $opt ) = @_;
-    for my $file ( @{ $self->zilla->files } ) {
-        if ( 't/00-report-prereqs.t' eq $file->name ) {
-            return $self->_munge_test($file);
-        }
-    }
-    $self->log_fatal(
-        'Did not find t/00-report-prereqs.t in zilla files cache, inline files broken?');
-}
+sub _dump_filename { 't/00-report-prereqs.dd' }
 
 sub _format_list {
     return join( "\n", map { "  $_" } @_ );
@@ -87,7 +105,7 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 =for Pod::Coverage
-setup_installer
+gather_files
 mvp_multivalue_args
 register_prereqs
 
@@ -100,7 +118,8 @@ register_prereqs
 
 =head1 DESCRIPTION
 
-This L<Dist::Zilla> plugin adds a F<t/00-report-prereqs.t> test file. It reports
+This L<Dist::Zilla> plugin adds a F<t/00-report-prereqs.t> test file and an accompanying
+F<t/00-report-prereqs.dd> data file. It reports
 the version of all modules listed in the distribution metadata prerequisites
 (including 'recommends', 'suggests', etc.).  However, any 'develop' prereqs
 are not reported (unless they show up in another category).
@@ -195,7 +214,7 @@ INSERT_EXCLUDED_MODULES_HERE
 );
 
 # Add static prereqs to the included modules list
-my $static_prereqs = INSERT_PREREQS_HERE;
+my $static_prereqs = do 'INSERT_DD_FILENAME_HERE';
 
 delete $static_prereqs->{develop} if not $ENV{AUTHOR_TESTING};
 $include{$_} = 1 for map { keys %$_ } map { values %$_ } values %$static_prereqs;
