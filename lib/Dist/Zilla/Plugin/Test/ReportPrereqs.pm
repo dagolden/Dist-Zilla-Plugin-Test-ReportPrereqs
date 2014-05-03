@@ -282,7 +282,7 @@ for my $phase ( qw(configure build test runtime develop) ) {
         my $title = ucfirst($phase).' '.ucfirst($type);
         my @reports = [qw/Module Want Have/];
 
-        for my $mod ( keys %{ $req_hash->{$phase}{$type} } ) {
+        for my $mod ( sort keys %{ $req_hash->{$phase}{$type} } ) {
             next if $mod eq 'perl';
             next if first { $_ eq $mod } @exclude;
 
