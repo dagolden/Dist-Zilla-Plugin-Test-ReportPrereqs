@@ -20,6 +20,7 @@ on 'test' => sub {
   requires "File::pushd" => "0";
   requires "List::Util" => "0";
   requires "Path::Class" => "0";
+  requires "Scalar::Util" => "0";
   requires "Test::Harness" => "0";
   requires "Test::More" => "0.96";
   requires "version" => "0";
@@ -35,7 +36,7 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
-  requires "Dist::Zilla" => "5";
+  requires "Dist::Zilla" => "5.015";
   requires "Dist::Zilla::PluginBundle::DAGOLDEN" => "0.053";
   requires "File::Spec" => "0";
   requires "File::Temp" => "0";

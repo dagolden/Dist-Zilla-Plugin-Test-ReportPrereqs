@@ -200,12 +200,14 @@ use Test::More tests => 1;
 
 use ExtUtils::MakeMaker;
 use File::Spec::Functions;
-use List::Util qw/max/;
+use List::Util qw/max first/;
+use Scalar::Util qw/blessed/;
 use version;
 
 # hide optional CPAN::Meta modules from prereq scanner
 # and check if they are available
 my $cpan_meta = "CPAN::Meta";
+my $cpan_meta_pre = "CPAN::Meta::Prereqs";
 my $cpan_meta_req = "CPAN::Meta::Requirements";
 my $HAS_CPAN_META = eval "require $cpan_meta"; ## no critic
 my $HAS_CPAN_META_REQ = eval "require $cpan_meta_req; $cpan_meta_req->VERSION('2.120900')";
@@ -213,112 +215,136 @@ my $HAS_CPAN_META_REQ = eval "require $cpan_meta_req; $cpan_meta_req->VERSION('2
 # Verify requirements?
 my $DO_VERIFY_PREREQS = INSERT_VERIFY_PREREQS_CONFIG;
 
-sub _merge_requires {
+sub _merge_prereqs {
     my ($collector, $prereqs) = @_;
-    for my $phase ( qw/configure build test runtime develop/ ) {
-        next unless exists $prereqs->{$phase};
-        if ( my $req = $prereqs->{$phase}{'requires'} ) {
-            my $cmr = CPAN::Meta::Requirements->from_string_hash( $req );
-            $collector->add_requirements( $cmr );
+
+    # CPAN::Meta::Prereqs object
+    if (blessed $collector eq $cpan_meta_pre) {
+        return $collector->with_merged_prereqs(
+            CPAN::Meta::Prereqs->new( $prereqs )
+        );
+    }
+
+    # Raw hashrefs
+    for my $phase ( keys %$prereqs ) {
+        for my $type ( keys %{ $prereqs->{$phase} } ) {
+            for my $module ( keys %{ $prereqs->{$phase}{$type} } ) {
+                $collector->{$phase}{$type}{$module} = $prereqs->{$phase}{$type}{$module};
+            }
         }
     }
+
+    return $collector;
 }
 
-my %include = map {; $_ => 1 } qw(
+my @include = qw(
 INSERT_INCLUDED_MODULES_HERE
 );
 
-my %exclude = map {; $_ => 1 } qw(
+my @exclude = qw(
 INSERT_EXCLUDED_MODULES_HERE
 );
 
 # Add static prereqs to the included modules list
 my $static_prereqs = do 'INSERT_DD_FILENAME_HERE';
 
-delete $static_prereqs->{develop} if not $ENV{AUTHOR_TESTING};
-$include{$_} = 1 for map { keys %$_ } map { values %$_ } values %$static_prereqs;
+### XXX: Assume these are Runtime Requires
+$static_prereqs->{runtime}{requires}{$_} = 0 for @include;
 
-# Merge requirements for major phases (if we can)
-my $all_requires;
-if ( $DO_VERIFY_PREREQS && $HAS_CPAN_META_REQ ) {
-    $all_requires = $cpan_meta_req->new;
-    _merge_requires($all_requires, $static_prereqs);
-}
-
+# Merge all prereqs (either with ::Prereqs or a hashref)
+my $full_prereqs = _merge_prereqs(
+    ( $HAS_CPAN_META ? $cpan_meta_pre->new : {} ),
+    $static_prereqs
+);
 
 # Add dynamic prereqs to the included modules list (if we can)
-my ($source) = grep { -f } 'MYMETA.json', 'MYMETA.yml';
+my $source = first { -f } 'MYMETA.json', 'MYMETA.yml';
 if ( $source && $HAS_CPAN_META ) {
-  if ( my $meta = eval { CPAN::Meta->load_file($source) } ) {
-    my $dynamic_prereqs = $meta->prereqs;
-    delete $dynamic_prereqs->{develop} if not $ENV{AUTHOR_TESTING};
-    $include{$_} = 1 for map { keys %$_ } map { values %$_ } values %$dynamic_prereqs;
-
-    if ( $DO_VERIFY_PREREQS && $HAS_CPAN_META_REQ ) {
-        _merge_requires($all_requires, $dynamic_prereqs);
+    if ( my $meta = eval { CPAN::Meta->load_file($source) } ) {
+        $full_prereqs = _merge_prereqs($full_prereqs, $meta->prereqs);
     }
-  }
 }
 else {
-  $source = 'static metadata';
+    $source = 'static metadata';
 }
 
-my @modules = sort grep { ! $exclude{$_} } keys %include;
-my @reports = [qw/Version Module/];
+my @full_reports;
 my @dep_errors;
-my $req_hash = defined($all_requires) ? $all_requires->as_string_hash : {};
+my $req_hash = $HAS_CPAN_META ? $full_prereqs->as_string_hash : $full_prereqs;
 
-for my $mod ( @modules ) {
-  next if $mod eq 'perl';
-  my $file = $mod;
-  $file =~ s{::}{/}g;
-  $file .= ".pm";
-  my ($prefix) = grep { -e catfile($_, $file) } @INC;
-  if ( $prefix ) {
-    my $ver = MM->parse_version( catfile($prefix, $file) );
-    $ver = "undef" unless defined $ver; # Newer MM should do this anyway
-    push @reports, [$ver, $mod];
+for my $phase ( qw(configure build test runtime develop) ) {
+    next unless $req_hash->{$phase};
+    next if ($phase eq 'develop' and not $ENV{AUTHOR_TESTING});
 
-    if ( $DO_VERIFY_PREREQS && $all_requires ) {
-      my $req = $req_hash->{$mod};
-      if ( defined $req && length $req ) {
-        if ( ! defined eval { version->parse($ver) } ) {
-          push @dep_errors, "$mod version '$ver' cannot be parsed (version '$req' required)";
+    for my $type ( qw(requires recommends suggests conflicts) ) {
+        next unless $req_hash->{$phase}{$type};
+
+        my $title = ucfirst($phase).' '.ucfirst($type);
+        my @reports = [qw/Module Want Have/];
+
+        for my $mod ( keys %{ $req_hash->{$phase}{$type} } ) {
+            next if $mod eq 'perl';
+            next if first { $_ eq $mod } @exclude;
+
+            my $file = $mod;
+            $file =~ s{::}{/}g;
+            $file .= ".pm";
+            my $prefix = first { -e catfile($_, $file) } @INC;
+
+            my $want = $req_hash->{$phase}{$type}{$mod};
+            $want = "undef" unless defined $want;
+            $want = "any" if !$want && $want == 0;
+
+            my $req_string = $want eq 'any' ? 'any version required' : "version '$want' required";
+
+            if ($prefix) {
+                my $have = MM->parse_version( catfile($prefix, $file) );
+                $have = "undef" unless defined $have;
+                push @reports, [$mod, $want, $have];
+
+                if ( $DO_VERIFY_PREREQS && $type eq 'requires' ) {
+                    if ( ! defined eval { version->parse($have) } ) {
+                        push @dep_errors, "$mod version '$have' cannot be parsed ($req_string)";
+                    }
+                    elsif ( ! $full_prereqs->requirements_for( $phase, $type )->accepts_module( $mod => $have ) ) {
+                        push @dep_errors, "$mod version '$have' is not in required range '$want'";
+                    }
+                }
+            }
+            else {
+                push @reports, [$mod, $want, "missing"];
+
+                if ( $DO_VERIFY_PREREQS && $type eq 'requires' ) {
+                    push @dep_errors, "$mod is not installed ($req_string)";
+                }
+            }
         }
-        elsif ( ! $all_requires->accepts_module( $mod => $ver ) ) {
-          push @dep_errors, "$mod version '$ver' is not in required range '$req'";
+
+        if ( @reports ) {
+            push @full_reports, "=== $title ===\n\n";
+
+            my $ml = max map { length $_->[0] } @reports;
+            my $wl = max map { length $_->[1] } @reports;
+            my $hl = max map { length $_->[2] } @reports;
+            splice @reports, 1, 0, ["-" x $ml, "-" x $wl, "-" x $hl];
+
+            push @full_reports, map { sprintf("    %*s %*s %*s\n", -$ml, $_->[0], $wl, $_->[1], $hl, $_->[2]) } @reports;
+            push @full_reports, "\n";
         }
-      }
     }
-
-  }
-  else {
-    push @reports, ["missing", $mod];
-
-    if ( $DO_VERIFY_PREREQS && $all_requires ) {
-      my $req = $req_hash->{$mod};
-      if ( defined $req && length $req ) {
-        push @dep_errors, "$mod is not installed (version '$req' required)";
-      }
-    }
-  }
 }
 
-if ( @reports ) {
-  my $vl = max map { length $_->[0] } @reports;
-  my $ml = max map { length $_->[1] } @reports;
-  splice @reports, 1, 0, ["-" x $vl, "-" x $ml];
-  diag "\nVersions for all modules listed in $source (including optional ones):\n",
-    map {sprintf("  %*s %*s\n",$vl,$_->[0],-$ml,$_->[1])} @reports;
+if ( @full_reports ) {
+    diag "\nVersions for all modules listed in $source (including optional ones):\n\n", @full_reports;
 }
 
 if ( @dep_errors ) {
-  diag join("\n",
-    "\n*** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***\n",
-    "The following REQUIRED prerequisites were not satisfied:\n",
-    @dep_errors,
-    "\n"
-  );
+    diag join("\n",
+        "\n*** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***\n",
+        "The following REQUIRED prerequisites were not satisfied:\n",
+        @dep_errors,
+        "\n"
+    );
 }
 
 pass;
