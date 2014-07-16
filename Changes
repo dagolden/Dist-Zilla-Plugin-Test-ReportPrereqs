@@ -2,6 +2,14 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+  [Changed]
+
+  - Test file generation split in two.  The test file is gathered early and
+    is available for analysis/munging by other plugins.  The static
+    dependency data is saved into another file late (after prereqs are
+    finalized).  The test file loads the static data at runtime.  This
+    should make this plugin validate with [VerifyPhases].
+
 0.013     2014-01-24 11:42:12-05:00 America/New_York
 
   [Changed]
