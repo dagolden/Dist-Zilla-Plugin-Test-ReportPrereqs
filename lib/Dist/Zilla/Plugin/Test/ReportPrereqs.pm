@@ -49,6 +49,7 @@ sub register_prereqs {
         'ExtUtils::MakeMaker' => 0,
         'File::Spec'          => 0,
         'List::Util'          => 0,
+        'Scalar::Util'        => 0,
         'version'             => 0.77, # based on CPAN::Meta::Requirements
     );
 

@@ -20,7 +20,6 @@ on 'test' => sub {
   requires "File::pushd" => "0";
   requires "List::Util" => "0";
   requires "Path::Class" => "0";
-  requires "Scalar::Util" => "0";
   requires "Test::Harness" => "0";
   requires "Test::More" => "0.96";
   requires "version" => "0";
@@ -28,7 +27,6 @@ on 'test' => sub {
 
 on 'test' => sub {
   recommends "CPAN::Meta" => "0";
-  recommends "CPAN::Meta::Prereqs" => "0";
   recommends "CPAN::Meta::Requirements" => "2.120900";
 };
 
