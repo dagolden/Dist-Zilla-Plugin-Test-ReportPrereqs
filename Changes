@@ -10,6 +10,11 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
     finalized).  The test file loads the static data at runtime.  This
     should make this plugin validate with [VerifyPhases].
 
+  - Test report format now splits out report by phase and type.  This means
+    that "Test Requires" are distinct from "Runtime Requires" and if there
+    are different versions required for each phase, those are visible in
+    the report.
+
 0.013     2014-01-24 11:42:12-05:00 America/New_York
 
   [Changed]
