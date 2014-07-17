@@ -28,6 +28,7 @@ on 'test' => sub {
 
 on 'test' => sub {
   recommends "CPAN::Meta" => "0";
+  recommends "CPAN::Meta::Prereqs" => "0";
   recommends "CPAN::Meta::Requirements" => "2.120900";
 };
 
@@ -36,7 +37,7 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
-  requires "Dist::Zilla" => "5.015";
+  requires "Dist::Zilla" => "5";
   requires "Dist::Zilla::PluginBundle::DAGOLDEN" => "0.053";
   requires "File::Spec" => "0";
   requires "File::Temp" => "0";

@@ -58,6 +58,7 @@ sub register_prereqs {
             type  => 'recommends',
         },
         'CPAN::Meta'               => '0',
+        'CPAN::Meta::Prereqs'      => '0',
         'CPAN::Meta::Requirements' => '2.120900',
     );
 }
@@ -249,7 +250,10 @@ INSERT_EXCLUDED_MODULES_HERE
 my $static_prereqs = do 'INSERT_DD_FILENAME_HERE';
 
 ### XXX: Assume these are Runtime Requires
-$static_prereqs->{runtime}{requires}{$_} = 0 for @include;
+my $static_prereqs_requires = $static_prereqs->{runtime}{requires};
+for my $mod (@include) {
+    $static_prereqs_requires->{$mod} = 0 unless exists $static_prereqs_requires->{$mod};
+}
 
 # Merge all prereqs (either with ::Prereqs or a hashref)
 my $full_prereqs = _merge_prereqs(
