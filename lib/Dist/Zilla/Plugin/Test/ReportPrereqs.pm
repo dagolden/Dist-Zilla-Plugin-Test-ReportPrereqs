@@ -44,6 +44,18 @@ sub register_prereqs {
     $self->zilla->register_prereqs(
         {
             phase => 'test',
+            type  => 'requires',
+        },
+        'Test::More'          => 0,
+        'ExtUtils::MakeMaker' => 0,
+        'File::Spec'          => 0,
+        'List::Util'          => 0,
+        'version'             => 0.77, # based on CPAN::Meta::Requirements
+    );
+
+    $self->zilla->register_prereqs(
+        {
+            phase => 'test',
             type  => 'recommends',
         },
         'CPAN::Meta'               => '0',
