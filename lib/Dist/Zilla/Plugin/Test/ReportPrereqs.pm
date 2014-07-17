@@ -13,8 +13,7 @@ with 'Dist::Zilla::Role::FileGatherer', 'Dist::Zilla::Role::PrereqSource';
 
 use Sub::Exporter::ForMethods;
 use Data::Section 0.200002 # encoding and bytes
-    { installer => Sub::Exporter::ForMethods::method_installer },
-    '-setup';
+  { installer => Sub::Exporter::ForMethods::method_installer }, '-setup';
 
 use Data::Dumper;
 
@@ -71,18 +70,26 @@ sub gather_files {
 
     require Dist::Zilla::File::InMemory;
 
-    for my $filename (keys %$data) {
-        $self->add_file(Dist::Zilla::File::InMemory->new({
-            name => $filename,
-            content => $self->_munge_test(${ $data->{$filename} }),
-        }));
+    for my $filename ( keys %$data ) {
+        $self->add_file(
+            Dist::Zilla::File::InMemory->new(
+                {
+                    name    => $filename,
+                    content => $self->_munge_test( ${ $data->{$filename} } ),
+                }
+            )
+        );
     }
 
     require Dist::Zilla::File::FromCode;
-    $self->add_file(Dist::Zilla::File::FromCode->new({
-        name => $self->_dump_filename,
-        code => sub { $self->_dump_prereqs },
-    }));
+    $self->add_file(
+        Dist::Zilla::File::FromCode->new(
+            {
+                name => $self->_dump_filename,
+                code => sub { $self->_dump_prereqs },
+            }
+        )
+    );
 
     return;
 }
