@@ -2,6 +2,10 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+  [Fixed]
+
+  - Fixed how the version regular expression is used (whoops!)
+
 0.015     2014-07-29 13:28:06-04:00 America/New_York
 
   [Changed]
