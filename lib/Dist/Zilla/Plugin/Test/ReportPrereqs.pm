@@ -50,7 +50,6 @@ sub register_prereqs {
         'File::Spec'          => 0,
         'List::Util'          => 0,
         'Scalar::Util'        => 0,
-        'version'             => 0.77, # based on CPAN::Meta::Requirements
     );
 
     $self->zilla->register_prereqs(
@@ -175,7 +174,7 @@ modules from the report (if you had a reason to do so).
 =head2 verify_prereqs
 
 When set, installed versions of all 'requires' prerequisites are verified
-against those specified.  Defaults to true.
+against those specified.  Defaults to true, but requires CPAN::Meta to be installed.
 
 =head1 SEE ALSO
 
@@ -204,7 +203,18 @@ use ExtUtils::MakeMaker;
 use File::Spec::Functions;
 use List::Util qw/max first/;
 use Scalar::Util qw/blessed/;
-use version;
+
+# from $version::LAX
+my $lax_version_re =
+    qr/(?: undef | (?^x: (?^:[0-9]+) (?: \. | (?^:\.[0-9]+) (?^:_[0-9]+)? )?
+            |
+            (?^:\.[0-9]+) (?^:_[0-9]+)?
+        ) | (?^x:
+            v (?^:[0-9]+) (?: (?^:\.[0-9]+)+ (?^:_[0-9]+)? )?
+            |
+            (?^:[0-9]+)? (?^:\.[0-9]+){2,} (?^:_[0-9]+)?
+        )
+    )/x;
 
 # hide optional CPAN::Meta modules from prereq scanner
 # and check if they are available
@@ -307,8 +317,8 @@ for my $phase ( qw(configure build test runtime develop) ) {
                 $have = "undef" unless defined $have;
                 push @reports, [$mod, $want, $have];
 
-                if ( $DO_VERIFY_PREREQS && $type eq 'requires' ) {
-                    if ( ! defined eval { version->parse($have) } ) {
+                if ( $DO_VERIFY_PREREQS && $HAS_CPAN_META && $type eq 'requires' ) {
+                    if ( $have !~ /\a$lax_version_re\Z/ ) {
                         push @dep_errors, "$mod version '$have' cannot be parsed ($req_string)";
                     }
                     elsif ( ! $full_prereqs->requirements_for( $phase, $type )->accepts_module( $mod => $have ) ) {
