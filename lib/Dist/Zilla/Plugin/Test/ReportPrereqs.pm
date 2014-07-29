@@ -57,9 +57,7 @@ sub register_prereqs {
             phase => 'test',
             type  => 'recommends',
         },
-        'CPAN::Meta'               => '0',
-        'CPAN::Meta::Prereqs'      => '0',
-        'CPAN::Meta::Requirements' => '2.120900',
+        'CPAN::Meta' => '2.120900',
     );
 }
 
@@ -220,9 +218,7 @@ my $lax_version_re =
 # and check if they are available
 my $cpan_meta = "CPAN::Meta";
 my $cpan_meta_pre = "CPAN::Meta::Prereqs";
-my $cpan_meta_req = "CPAN::Meta::Requirements";
-my $HAS_CPAN_META = eval "require $cpan_meta"; ## no critic
-my $HAS_CPAN_META_REQ = eval "require $cpan_meta_req; $cpan_meta_req->VERSION('2.120900')";
+my $HAS_CPAN_META = eval "require $cpan_meta; $cpan_meta->VERSION('2.120900')" && eval "require $cpan_meta_pre"; ## no critic
 
 # Verify requirements?
 my $DO_VERIFY_PREREQS = INSERT_VERIFY_PREREQS_CONFIG;
