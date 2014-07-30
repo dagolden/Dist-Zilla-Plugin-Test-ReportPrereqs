@@ -2,6 +2,8 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+0.017     2014-07-30 16:48:36-04:00 America/New_York
+
   [Changed]
 
   - generated test file uses File::Spec instead of File::Spec::Functions
