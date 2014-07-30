@@ -17,7 +17,6 @@ on 'test' => sub {
   requires "Dist::Zilla::Tester" => "0";
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
-  requires "File::Spec::Functions" => "0";
   requires "File::pushd" => "0";
   requires "List::Util" => "0";
   requires "Path::Class" => "0";

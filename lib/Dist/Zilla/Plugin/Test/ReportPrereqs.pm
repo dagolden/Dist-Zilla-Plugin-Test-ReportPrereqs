@@ -198,7 +198,7 @@ use warnings;
 use Test::More tests => 1;
 
 use ExtUtils::MakeMaker;
-use File::Spec::Functions;
+use File::Spec;
 use List::Util qw/max first/;
 use Scalar::Util qw/blessed/;
 
@@ -300,7 +300,7 @@ for my $phase ( qw(configure build test runtime develop) ) {
             my $file = $mod;
             $file =~ s{::}{/}g;
             $file .= ".pm";
-            my $prefix = first { -e catfile($_, $file) } @INC;
+            my $prefix = first { -e File::Spec->catfile($_, $file) } @INC;
 
             my $want = $req_hash->{$phase}{$type}{$mod};
             $want = "undef" unless defined $want;
@@ -309,7 +309,7 @@ for my $phase ( qw(configure build test runtime develop) ) {
             my $req_string = $want eq 'any' ? 'any version required' : "version '$want' required";
 
             if ($prefix) {
-                my $have = MM->parse_version( catfile($prefix, $file) );
+                my $have = MM->parse_version( File::Spec->catfile($prefix, $file) );
                 $have = "undef" unless defined $have;
                 push @reports, [$mod, $want, $have];
 
