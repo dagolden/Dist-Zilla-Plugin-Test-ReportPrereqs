@@ -4,19 +4,19 @@ use warnings;
 use Test::More 0.96;
 
 use Capture::Tiny qw/capture/;
+use CPAN::Meta; # needed for missing prereq detection test
 use Dist::Zilla::Tester;
 use File::pushd qw/pushd/;
-use Path::Class;
+use File::Spec;
 use Test::Harness;
-use Cwd;
 
-my $test_file = file(qw(t 00-report-prereqs.t));
+my $test_file = File::Spec->catfile(qw(t 00-report-prereqs.t));
 my $root      = 'corpus/DZ';
 
 # Adapted from DZP-CheckChangesHasContent
 sub capture_test_results {
     my $build_dir      = shift;
-    my $test_file_full = file( $build_dir, $test_file )->stringify;
+    my $test_file_full = File::Spec->catfile( $build_dir, $test_file );
     my $wd             = pushd $build_dir;
     return capture {
         # I'd use TAP::Parser here, except the docs are horrid.
@@ -31,10 +31,10 @@ sub capture_test_results {
 
     $tzil->build_in;
 
-    my $cwd = getcwd;
-    chdir $tzil->tempdir->subdir('build');
-    capture { system( $^X, 'Makefile.PL' ) }; # create MYMETA.json
-    chdir $cwd;
+    {
+        my $wd = pushd( $tzil->tempdir->subdir('build') );
+        capture { system( $^X, 'Makefile.PL' ) }; # create MYMETA.json
+    }
 
     my ( $out, $err, $total, $failed ) = capture_test_results( $tzil->built_in );
     is( $total->{ok}, 1, 'test passed' )
