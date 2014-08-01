@@ -2,6 +2,8 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+0.018     2014-08-01 12:22:01-04:00 America/New_York
+
   [Changed]
 
   - Removes List::Util and Scalar::Util as runtime dependencies for better
