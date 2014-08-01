@@ -2,6 +2,11 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+  [Changed]
+
+  - Removes Scalar::Util as a prerequisite; fixes an unintialized value
+    warning when CPAN::Meta isn't installed
+
 0.017     2014-07-30 16:48:36-04:00 America/New_York
 
   [Changed]

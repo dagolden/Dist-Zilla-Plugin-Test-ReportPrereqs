@@ -49,7 +49,6 @@ sub register_prereqs {
         'ExtUtils::MakeMaker' => 0,
         'File::Spec'          => 0,
         'List::Util'          => 0,
-        'Scalar::Util'        => 0,
     );
 
     $self->zilla->register_prereqs(
@@ -200,7 +199,6 @@ use Test::More tests => 1;
 use ExtUtils::MakeMaker;
 use File::Spec;
 use List::Util qw/max first/;
-use Scalar::Util qw/blessed/;
 
 # from $version::LAX
 my $lax_version_re =
@@ -227,7 +225,7 @@ sub _merge_prereqs {
     my ($collector, $prereqs) = @_;
 
     # CPAN::Meta::Prereqs object
-    if (blessed $collector eq $cpan_meta_pre) {
+    if (ref $collector eq $cpan_meta_pre) {
         return $collector->with_merged_prereqs(
             CPAN::Meta::Prereqs->new( $prereqs )
         );
