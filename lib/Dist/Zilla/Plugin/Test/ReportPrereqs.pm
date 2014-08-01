@@ -48,7 +48,6 @@ sub register_prereqs {
         'Test::More'          => 0,
         'ExtUtils::MakeMaker' => 0,
         'File::Spec'          => 0,
-        'List::Util'          => 0,
     );
 
     $self->zilla->register_prereqs(
@@ -198,7 +197,6 @@ use Test::More tests => 1;
 
 use ExtUtils::MakeMaker;
 use File::Spec;
-use List::Util qw/max first/;
 
 # from $version::LAX
 my $lax_version_re =
@@ -220,6 +218,12 @@ my $HAS_CPAN_META = eval "require $cpan_meta; $cpan_meta->VERSION('2.120900')" &
 
 # Verify requirements?
 my $DO_VERIFY_PREREQS = INSERT_VERIFY_PREREQS_CONFIG;
+
+sub _max {
+    my $max = shift;
+    $max = ( $_ > $max ) ? $_ : $max for @_;
+    return $max;
+}
 
 sub _merge_prereqs {
     my ($collector, $prereqs) = @_;
@@ -267,7 +271,7 @@ my $full_prereqs = _merge_prereqs(
 );
 
 # Add dynamic prereqs to the included modules list (if we can)
-my $source = first { -f } 'MYMETA.json', 'MYMETA.yml';
+my ($source) = grep { -f } 'MYMETA.json', 'MYMETA.yml';
 if ( $source && $HAS_CPAN_META ) {
     if ( my $meta = eval { CPAN::Meta->load_file($source) } ) {
         $full_prereqs = _merge_prereqs($full_prereqs, $meta->prereqs);
@@ -293,12 +297,12 @@ for my $phase ( qw(configure build test runtime develop) ) {
 
         for my $mod ( sort keys %{ $req_hash->{$phase}{$type} } ) {
             next if $mod eq 'perl';
-            next if first { $_ eq $mod } @exclude;
+            next if grep { $_ eq $mod } @exclude;
 
             my $file = $mod;
             $file =~ s{::}{/}g;
             $file .= ".pm";
-            my $prefix = first { -e File::Spec->catfile($_, $file) } @INC;
+            my ($prefix) = grep { -e File::Spec->catfile($_, $file) } @INC;
 
             my $want = $req_hash->{$phase}{$type}{$mod};
             $want = "undef" unless defined $want;
@@ -332,9 +336,9 @@ for my $phase ( qw(configure build test runtime develop) ) {
         if ( @reports ) {
             push @full_reports, "=== $title ===\n\n";
 
-            my $ml = max map { length $_->[0] } @reports;
-            my $wl = max map { length $_->[1] } @reports;
-            my $hl = max map { length $_->[2] } @reports;
+            my $ml = _max( map { length $_->[0] } @reports );
+            my $wl = _max( map { length $_->[1] } @reports );
+            my $hl = _max( map { length $_->[2] } @reports );
             splice @reports, 1, 0, ["-" x $ml, "-" x $wl, "-" x $hl];
 
             push @full_reports, map { sprintf("    %*s %*s %*s\n", -$ml, $_->[0], $wl, $_->[1], $hl, $_->[2]) } @reports;

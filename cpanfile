@@ -18,7 +18,6 @@ on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
   requires "File::pushd" => "0";
-  requires "List::Util" => "0";
   requires "Path::Class" => "0";
   requires "Test::Harness" => "0";
   requires "Test::More" => "0.96";
