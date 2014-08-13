@@ -161,6 +161,8 @@ are reported after the list of all versions based on either F<MYMETA>
 An C<include> attribute can be specified (multiple times) to add modules
 to the report.  This can be useful if there is a module in the dependency
 chain that is problematic but is not directly required by this project.
+These modules will be listed in an "Other Modules" section at the end of
+the report.
 
 =head2 exclude
 
@@ -258,12 +260,6 @@ INSERT_EXCLUDED_MODULES_HERE
 # Add static prereqs to the included modules list
 my $static_prereqs = do 'INSERT_DD_FILENAME_HERE';
 
-### XXX: Assume these are Runtime Requires
-my $static_prereqs_requires = $static_prereqs->{runtime}{requires};
-for my $mod (@include) {
-    $static_prereqs_requires->{$mod} = 0 unless exists $static_prereqs_requires->{$mod};
-}
-
 # Merge all prereqs (either with ::Prereqs or a hashref)
 my $full_prereqs = _merge_prereqs(
     ( $HAS_CPAN_META ? $cpan_meta_pre->new : {} ),
@@ -285,11 +281,16 @@ my @full_reports;
 my @dep_errors;
 my $req_hash = $HAS_CPAN_META ? $full_prereqs->as_string_hash : $full_prereqs;
 
-for my $phase ( qw(configure build test runtime develop) ) {
+# Add static includes into a fake section
+for my $mod (@include) {
+    $req_hash->{other}{modules}{$mod} = 0;
+}
+
+for my $phase ( qw(configure build test runtime develop other) ) {
     next unless $req_hash->{$phase};
     next if ($phase eq 'develop' and not $ENV{AUTHOR_TESTING});
 
-    for my $type ( qw(requires recommends suggests conflicts) ) {
+    for my $type ( qw(requires recommends suggests conflicts modules) ) {
         next unless $req_hash->{$phase}{$type};
 
         my $title = ucfirst($phase).' '.ucfirst($type);

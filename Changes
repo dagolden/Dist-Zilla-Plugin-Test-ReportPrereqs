@@ -2,6 +2,11 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+  [Changed]
+
+  - Modules included in the dist.ini file are now put in their own report
+    section "Other Modules" instead of being merged into Runtime Requires.
+
 0.018     2014-08-01 12:22:01-04:00 America/New_York
 
   [Changed]
