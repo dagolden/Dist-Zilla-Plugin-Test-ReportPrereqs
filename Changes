@@ -2,6 +2,8 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+0.019     2014-08-13 12:20:18-04:00 America/New_York
+
   [Changed]
 
   - Modules included in the dist.ini file are now put in their own report
