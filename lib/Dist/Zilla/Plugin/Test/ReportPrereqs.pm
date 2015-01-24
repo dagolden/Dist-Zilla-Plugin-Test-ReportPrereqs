@@ -340,9 +340,16 @@ for my $phase ( qw(configure build test runtime develop other) ) {
             my $ml = _max( map { length $_->[0] } @reports );
             my $wl = _max( map { length $_->[1] } @reports );
             my $hl = _max( map { length $_->[2] } @reports );
-            splice @reports, 1, 0, ["-" x $ml, "-" x $wl, "-" x $hl];
 
-            push @full_reports, map { sprintf("    %*s %*s %*s\n", -$ml, $_->[0], $wl, $_->[1], $hl, $_->[2]) } @reports;
+            if ($type eq 'modules') {
+                splice @reports, 1, 0, ["-" x $ml, "", "-" x $hl];
+                push @full_reports, map { sprintf("    %*s %*s\n", -$ml, $_->[0], $hl, $_->[2]) } @reports;
+            }
+            else {
+                splice @reports, 1, 0, ["-" x $ml, "-" x $wl, "-" x $hl];
+                push @full_reports, map { sprintf("    %*s %*s %*s\n", -$ml, $_->[0], $wl, $_->[1], $hl, $_->[2]) } @reports;
+            }
+
             push @full_reports, "\n";
         }
     }
