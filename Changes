@@ -2,6 +2,10 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+  [Fixed]
+
+  - fixed test corpus to avoid META validation errors
+
 0.020     2015-01-27 09:59:52-05:00 America/New_York
 
   [Changed]
