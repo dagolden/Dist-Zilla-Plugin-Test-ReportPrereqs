@@ -17,6 +17,7 @@ use Data::Section 0.200002 # encoding and bytes
   { installer => Sub::Exporter::ForMethods::method_installer }, '-setup';
 
 use Data::Dumper;
+use Moose::Util::TypeConstraints 'enum';
 
 sub mvp_multivalue_args {
     return qw( include exclude );
@@ -38,6 +39,12 @@ has verify_prereqs => (
     default => 1,
 );
 
+has version_extractor => (
+    is      => 'ro',
+    isa     => enum([qw(ExtUtils::MakeMaker Module::Metadata)]),
+    default => 'ExtUtils::MakeMaker',
+);
+
 sub register_prereqs {
     my $self = shift;
 
@@ -47,7 +54,7 @@ sub register_prereqs {
             type  => 'requires',
         },
         'Test::More'          => 0,
-        'ExtUtils::MakeMaker' => 0,
+        $self->version_extractor => 0,
         'File::Spec'          => 0,
     );
 
@@ -99,6 +106,15 @@ sub _munge_test {
     $guts =~ s{INSERT_INCLUDED_MODULES_HERE}{_format_list($self->included_modules)}e;
     $guts =~ s{INSERT_EXCLUDED_MODULES_HERE}{_format_list($self->excluded_modules)}e;
     $guts =~ s{INSERT_VERIFY_PREREQS_CONFIG}{$self->verify_prereqs ? 1 : 0}e;
+    $guts =~ s{VERSION_EXTRACTOR_MODULE}{$self->version_extractor}e;
+    if ($self->version_extractor eq 'ExtUtils::MakeMaker') {
+        $guts =~ s'VERSION_EXTRACTION'MM->parse_version( File::Spec->catfile($prefix, $file) )';
+
+    }
+    else {  # Module::Metadata
+        $guts =~ s'VERSION_EXTRACTION'Module::Metadata->new_from_file( File::Spec->catfile($prefix, $file) )->version';
+    }
+
     return $guts;
 }
 
@@ -175,6 +191,13 @@ modules from the report (if you had a reason to do so).
 When set, installed versions of all 'requires' prerequisites are verified
 against those specified.  Defaults to true, but requires CPAN::Meta to be installed.
 
+-head2 version_extractor
+
+Specifies the module to use to extract each installed prerequisite's version.
+Defaults to L<ExtUtils::MakeMaker>; can also be specified as L<Module::Metadata>,
+which can be useful if EUMM's mechanism is too naive, or if L<ExtUtils::MakeMaker>
+is not already a prerequisite of the distribution.
+
 =head1 SEE ALSO
 
 Other Dist::Zilla::Plugins do similar things in slightly different ways that didn't
@@ -198,7 +221,7 @@ use warnings;
 
 use Test::More tests => 1;
 
-use ExtUtils::MakeMaker;
+use VERSION_EXTRACTOR_MODULE;
 use File::Spec;
 
 # from $version::LAX
@@ -313,7 +336,7 @@ for my $phase ( qw(configure build test runtime develop other) ) {
             my $req_string = $want eq 'any' ? 'any version required' : "version '$want' required";
 
             if ($prefix) {
-                my $have = MM->parse_version( File::Spec->catfile($prefix, $file) );
+                my $have = VERSION_EXTRACTION;
                 $have = "undef" unless defined $have;
                 push @reports, [$mod, $want, $have];
 
