@@ -2,6 +2,10 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+  [Added]
+
+  - Added option to use Module::Metadata for prereq version extraction
+
 0.021     2015-03-24 23:38:55-04:00 America/New_York
 
   [Fixed]
