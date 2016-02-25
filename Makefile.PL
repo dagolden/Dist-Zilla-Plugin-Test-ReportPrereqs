@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::Harness" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.022",
+  "VERSION" => "0.023",
   "test" => {
     "TESTS" => "t/*.t"
   }
