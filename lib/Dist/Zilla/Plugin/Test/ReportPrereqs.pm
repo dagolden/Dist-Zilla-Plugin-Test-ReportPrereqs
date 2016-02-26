@@ -5,7 +5,7 @@ use warnings;
 package Dist::Zilla::Plugin::Test::ReportPrereqs;
 # ABSTRACT: Report on prerequisite versions during automated testing
 
-our $VERSION = '0.023';
+our $VERSION = '0.025';
 
 use Dist::Zilla 4 ();
 
