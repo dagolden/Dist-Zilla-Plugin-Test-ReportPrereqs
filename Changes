@@ -2,6 +2,11 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+  [Changed]
+
+  - Switched tests to use Path::Tiny over assuming dzil objects are
+    Path::Class.
+
 0.022     2016-02-25 17:15:30-05:00 America/New_York
 
   [Added]

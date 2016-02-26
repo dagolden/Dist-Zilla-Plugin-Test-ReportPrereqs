@@ -36,6 +36,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "File::pushd" => 0,
+    "Path::Tiny" => 0,
     "Test::Harness" => 0,
     "Test::More" => "0.96"
   },
@@ -62,6 +63,7 @@ my %FallbackPrereqs = (
   "File::pushd" => 0,
   "Moose" => 0,
   "Moose::Util::TypeConstraints" => 0,
+  "Path::Tiny" => 0,
   "Sub::Exporter::ForMethods" => 0,
   "Test::Harness" => 0,
   "Test::More" => "0.96",
