@@ -8,6 +8,7 @@ use CPAN::Meta; # needed for missing prereq detection test
 use Dist::Zilla::Tester;
 use File::pushd qw/pushd/;
 use File::Spec;
+use Path::Tiny;
 use Test::Harness;
 
 my $test_file = File::Spec->catfile(qw(t 00-report-prereqs.t));
@@ -32,7 +33,8 @@ sub capture_test_results {
     $tzil->build_in;
 
     {
-        my $wd = pushd( $tzil->tempdir->subdir('build') );
+        my $build_dir = path($tzil->tempdir)->child('build');
+        my $wd = pushd( $build_dir );
         capture { system( $^X, 'Makefile.PL' ) }; # create MYMETA.json
     }
 
