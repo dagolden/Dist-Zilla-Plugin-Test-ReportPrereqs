@@ -295,10 +295,10 @@ my $full_prereqs = _merge_prereqs(
 
 # Add dynamic prereqs to the included modules list (if we can)
 my ($source) = grep { -f } 'MYMETA.json', 'MYMETA.yml';
-if ( $source && $HAS_CPAN_META ) {
-    if ( my $meta = eval { CPAN::Meta->load_file($source) } ) {
-        $full_prereqs = _merge_prereqs($full_prereqs, $meta->prereqs);
-    }
+if ( $source && $HAS_CPAN_META
+    && (my $meta = eval { CPAN::Meta->load_file($source) } )
+) {
+    $full_prereqs = _merge_prereqs($full_prereqs, $meta->prereqs);
 }
 else {
     $source = 'static metadata';

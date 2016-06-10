@@ -2,6 +2,10 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+  [Fixed]
+
+  - Prereq source reported correctly if (MY)META fails to load.
+
 0.024     2016-02-26 13:18:29-05:00 America/New_York
 
   [Changed]
