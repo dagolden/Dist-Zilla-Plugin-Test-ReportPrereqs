@@ -295,12 +295,14 @@ my $full_prereqs = _merge_prereqs(
 
 # Add dynamic prereqs to the included modules list (if we can)
 my ($source) = grep { -f } 'MYMETA.json', 'MYMETA.yml';
+my $cpan_meta_error;
 if ( $source && $HAS_CPAN_META
     && (my $meta = eval { CPAN::Meta->load_file($source) } )
 ) {
     $full_prereqs = _merge_prereqs($full_prereqs, $meta->prereqs);
 }
 else {
+    $cpan_meta_error = $@;    # capture error from CPAN::Meta->load_file($source)
     $source = 'static metadata';
 }
 
@@ -386,10 +388,18 @@ if ( @full_reports ) {
     diag "\nVersions for all modules listed in $source (including optional ones):\n\n", @full_reports;
 }
 
+if ( $cpan_meta_error || @dep_errors ) {
+    diag "\n*** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***\n";
+}
+
+if ( $cpan_meta_error ) {
+    my ($orig_source) = grep { -f } 'MYMETA.json', 'MYMETA.yml';
+    diag "\nCPAN::Meta->load_file('$orig_source') failed with: $cpan_meta_error\n";
+}
+
 if ( @dep_errors ) {
     diag join("\n",
-        "\n*** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***\n",
-        "The following REQUIRED prerequisites were not satisfied:\n",
+        "\nThe following REQUIRED prerequisites were not satisfied:\n",
         @dep_errors,
         "\n"
     );
