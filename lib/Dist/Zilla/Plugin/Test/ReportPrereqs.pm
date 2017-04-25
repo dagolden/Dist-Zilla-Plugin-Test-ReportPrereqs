@@ -120,7 +120,7 @@ sub _munge_test {
     return $guts;
 }
 
-sub _dump_filename { 't/00-report-prereqs.dd' }
+sub _dump_filename { './t/00-report-prereqs.dd' }
 
 sub _format_list {
     return join( "\n", map { "  $_" } @_ );
