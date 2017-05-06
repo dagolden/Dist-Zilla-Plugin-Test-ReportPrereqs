@@ -2,6 +2,8 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+0.026     2017-05-05 22:30:00-04:00 America/New_York
+
   [Fixed]
 
   - Prereq data file is properly sourced in newer perls, when . is no longer
