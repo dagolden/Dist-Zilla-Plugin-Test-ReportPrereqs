@@ -4,8 +4,12 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
   [Fixed]
 
-  - prereq data file is properly sourced in newer perls, when . is no longer
+  - Prereq data file is properly sourced in newer perls, when . is no longer
     in @INC
+
+  [Changed]
+
+  - Improve diagnostics if loading metadata fails.
 
 0.025     2016-06-09 22:08:35-04:00 America/New_York
 
