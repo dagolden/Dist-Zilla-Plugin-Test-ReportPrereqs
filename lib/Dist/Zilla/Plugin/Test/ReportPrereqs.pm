@@ -102,7 +102,7 @@ sub gather_files {
 sub _munge_test {
     my ( $self, $guts ) = @_;
     $guts =~ s{INSERT_VERSION_HERE}{$self->VERSION || '<self>'}e;
-    $guts =~ s{INSERT_DD_FILENAME_HERE}{$self->_dump_filename}e;
+    $guts =~ s{INSERT_DD_FILENAME_HERE}{'./' . $self->_dump_filename}e;
     $guts =~ s{INSERT_INCLUDED_MODULES_HERE}{_format_list($self->included_modules)}e;
     $guts =~ s{INSERT_EXCLUDED_MODULES_HERE}{_format_list($self->excluded_modules)}e;
     $guts =~ s{INSERT_VERIFY_PREREQS_CONFIG}{$self->verify_prereqs ? 1 : 0}e;
@@ -120,7 +120,7 @@ sub _munge_test {
     return $guts;
 }
 
-sub _dump_filename { './t/00-report-prereqs.dd' }
+sub _dump_filename { 't/00-report-prereqs.dd' }
 
 sub _format_list {
     return join( "\n", map { "  $_" } @_ );
