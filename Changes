@@ -2,6 +2,8 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+0.027     2017-05-07 22:59:43-04:00 America/New_York
+
   [Fixed]
 
   - fixed error in 0.026 that would cause t/00-report-prereqs.dd to be pruned
