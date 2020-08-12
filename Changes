@@ -2,6 +2,8 @@ Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
 {{$NEXT}}
 
+0.028     2020-08-12 09:08:25-04:00 America/New_York
+
   [Changed]
 
   - Passed a test name in the call to `pass()` in the generated test
