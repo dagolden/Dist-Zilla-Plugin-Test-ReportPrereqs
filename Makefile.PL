@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.020;
 
 use ExtUtils::MakeMaker 6.17;
 
@@ -13,7 +13,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-Plugin-Test-ReportPrereqs",
   "LICENSE" => "apache",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.020",
   "NAME" => "Dist::Zilla::Plugin::Test::ReportPrereqs",
   "PREREQ_PM" => {
     "Data::Dumper" => 0,
@@ -26,7 +26,6 @@ my %WriteMakefileArgs = (
     "Moose" => 0,
     "Moose::Util::TypeConstraints" => 0,
     "Sub::Exporter::ForMethods" => 0,
-    "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -38,7 +37,8 @@ my %WriteMakefileArgs = (
     "File::pushd" => 0,
     "Path::Tiny" => 0,
     "Test::Harness" => 0,
-    "Test::More" => "0.96"
+    "Test::More" => "0.96",
+    "strict" => 0
   },
   "VERSION" => "0.029",
   "test" => {

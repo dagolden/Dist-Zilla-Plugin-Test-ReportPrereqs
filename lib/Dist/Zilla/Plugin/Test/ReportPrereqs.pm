@@ -1,5 +1,4 @@
-use 5.006;
-use strict;
+use 5.020;
 use warnings;
 
 package Dist::Zilla::Plugin::Test::ReportPrereqs;
@@ -326,19 +325,23 @@ for my $phase ( qw(configure build test runtime develop other) ) {
         my @reports = [qw/Module Want Have/];
 
         for my $mod ( sort keys %{ $req_hash->{$phase}{$type} } ) {
-            next if $mod eq 'perl';
             next if grep { $_ eq $mod } @exclude;
-
-            my $file = $mod;
-            $file =~ s{::}{/}g;
-            $file .= ".pm";
-            my ($prefix) = grep { -e File::Spec->catfile($_, $file) } @INC;
 
             my $want = $req_hash->{$phase}{$type}{$mod};
             $want = "undef" unless defined $want;
             $want = "any" if !$want && $want == 0;
 
+            if ($mod eq 'perl') {
+                push @reports, ['perl', $want, $]];
+                next;
+            }
+
             my $req_string = $want eq 'any' ? 'any version required' : "version '$want' required";
+
+            my $file = $mod;
+            $file =~ s{::}{/}g;
+            $file .= ".pm";
+            my ($prefix) = grep { -e File::Spec->catfile($_, $file) } @INC;
 
             if ($prefix) {
                 my $have = VERSION_EXTRACTION;
