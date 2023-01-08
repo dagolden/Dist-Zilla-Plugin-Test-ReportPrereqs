@@ -1,5 +1,4 @@
-use 5.006;
-use strict;
+use 5.020;
 use warnings;
 
 package Dist::Zilla::Plugin::Test::ReportPrereqs;
